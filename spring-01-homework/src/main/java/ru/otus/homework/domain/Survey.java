@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class Survey {
-    private List<Question> questions = new ArrayList<>();
+    private final List<Question> questions = new ArrayList<>();
 
     // Результат теста
     private int score = 0;

@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 public class SurveyDaoImpl implements SurveyDao {
 
-    private Resource surveyResource;
+    private final Resource surveyResource;
 
     public SurveyDaoImpl(Resource surveyResource) {
         this.surveyResource = surveyResource;
@@ -54,7 +54,7 @@ public class SurveyDaoImpl implements SurveyDao {
         try (CSVReader reader = new CSVReader(new InputStreamReader(surveyResource.getInputStream()))) {
             return reader.readAll();
         } catch (IOException | CsvException ex) {
-            log.error("SurveyDaoImpl.getSurvey read resource Exception", ex);;
+            log.error("SurveyDaoImpl.getSurvey read resource Exception", ex);
         }
         return Collections.emptyList();
     }

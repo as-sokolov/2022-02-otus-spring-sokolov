@@ -7,7 +7,7 @@ import ru.otus.homework.view.QuestionView;
 import ru.otus.homework.view.SummaryView;
 
 public class SurveyServiceImpl implements SurveyService {
-    protected SurveyDao dao;
+    protected final SurveyDao dao;
 
     public SurveyServiceImpl(SurveyDao dao) {
         this.dao = dao;

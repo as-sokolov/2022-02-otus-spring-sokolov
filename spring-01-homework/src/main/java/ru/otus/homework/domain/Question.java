@@ -7,7 +7,7 @@ import lombok.Data;
 public abstract class Question {
 
     // Формлуировка вопроса
-    protected String questionText;
+    protected final String questionText;
 
     // Пользовательский ответ
     protected String answer;
