@@ -14,6 +14,24 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     /**
+     * Полный цикл проведения теста: загрузка, отображение, подсчет и вывод результатов
+     */
+    @Override
+    public void executeSurvey() {
+        // Загружаем тест из файла
+        Survey survey = loadSurvey();
+
+        // Отображаем вопросы, считываем ответы
+        askQuestions(survey);
+
+        // Подсчитываем баллы
+        calculateScore(survey);
+
+        // Отображаем результаты
+        showSummary(survey);
+    }
+
+    /**
      * Загружаем тест из файла
      *
      * @return Survey c тестом
@@ -33,24 +51,6 @@ public class SurveyServiceImpl implements SurveyService {
             totalScore += question.checkAnswer();
         }
         survey.setScore(totalScore);
-    }
-
-    /**
-     * Полный цикл проведения теста: загрузка, отображение, подсчет и вывод результатов
-     */
-    @Override
-    public void executeSurvey() {
-        // Загружаем тест из файла
-        Survey survey = loadSurvey();
-
-        // Отображаем вопросы, считываем ответы
-        askQuestions(survey);
-
-        // Подсчитываем баллы
-        calculateScore(survey);
-
-        // Отображаем результаты
-        showSummary(survey);
     }
 
     /**

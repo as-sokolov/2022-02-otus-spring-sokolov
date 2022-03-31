@@ -10,13 +10,13 @@ import ru.otus.homework.domain.Question;
 import ru.otus.homework.domain.Survey;
 import ru.otus.homework.domain.NoVariantQuestion;
 import ru.otus.homework.domain.MultiVariantQuestion;
+import ru.otus.homework.helper.CSVHelper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@Data
 @Slf4j
 public class SurveyDaoImpl implements SurveyDao {
 
@@ -37,7 +37,7 @@ public class SurveyDaoImpl implements SurveyDao {
             return survey;
         }
 
-        for (String[] string : readCSVResource()) {
+        for (String[] string : CSVHelper.read(surveyResource)) {
             Question question = parseQuestion(string);
             if (null != question) {
                 survey.getQuestions().add(question);
@@ -45,18 +45,6 @@ public class SurveyDaoImpl implements SurveyDao {
         }
 
         return survey;
-    }
-
-    /** Чтение csv-файла
-     * @return список прочитанных строк
-     */
-    private List<String[]> readCSVResource() {
-        try (CSVReader reader = new CSVReader(new InputStreamReader(surveyResource.getInputStream()))) {
-            return reader.readAll();
-        } catch (IOException | CsvException ex) {
-            log.error("SurveyDaoImpl.getSurvey read resource Exception", ex);
-        }
-        return Collections.emptyList();
     }
 
     /** Парсинг вопроса из строчки csv файла
