@@ -4,15 +4,17 @@ import org.springframework.stereotype.Service;
 import ru.otus.homework.dao.SurveyDao;
 import ru.otus.homework.domain.Question;
 import ru.otus.homework.domain.Survey;
-import ru.otus.homework.view.QuestionView;
-import ru.otus.homework.view.SummaryView;
+import ru.otus.homework.view.SurveyView;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
-    protected final SurveyDao dao;
+    private final SurveyDao dao;
 
-    public SurveyServiceImpl(SurveyDao dao) {
+    private final SurveyView surveyView;
+
+    public SurveyServiceImpl(SurveyDao dao, SurveyView surveyView) {
         this.dao = dao;
+        this.surveyView = surveyView;
     }
 
     /**
@@ -62,7 +64,7 @@ public class SurveyServiceImpl implements SurveyService {
      */
     private void askQuestions(Survey survey) {
         for (Question question : survey.getQuestions()) {
-            QuestionView.askQuestion(question);
+            surveyView.askQuestion(question);
         }
     }
 
@@ -72,6 +74,6 @@ public class SurveyServiceImpl implements SurveyService {
      * @param survey
      */
     private void showSummary(Survey survey) {
-        SummaryView.showSummary(survey);
+        surveyView.showSummary(survey);
     }
 }

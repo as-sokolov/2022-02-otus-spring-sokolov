@@ -2,21 +2,30 @@ package ru.otus.homework.view;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import ru.otus.homework.domain.Question;
+import org.springframework.stereotype.Component;
 import ru.otus.homework.domain.MultiVariantQuestion;
+import ru.otus.homework.domain.Question;
+import ru.otus.homework.domain.Survey;
 import java.util.Scanner;
 
 /**
- * Вью для отображения вопросв и считывания ответов
+ * Отображение результатов теста
  */
-public class QuestionView {
+@Component
+public class SurveyViewConsole implements SurveyView {
+
+    private static final String SURVEY_PASSED = "Congratulations! You have passed the survey";
+    private static final String SURVEY_FAILED = "Your score is too low. You haven't passed the survey";
+    private static final String TOTAL_SCORE = "Survey total score: %s";
+    private static final String SUMMARY_CAPTION = "***Survey summary***";
 
     /**
      * Отображаем вопрос
      *
      * @param question
      */
-    public static void askQuestion(Question question) {
+    @Override
+    public void askQuestion(Question question) {
         System.out.println(question.getQuestionText());
 
         // накладные расходы отделения View от Model
@@ -27,13 +36,23 @@ public class QuestionView {
         handleAnswer(question);
     }
 
+    @Override
+    public void showSummary(Survey survey) {
+        // Отображаем в простой форме: количество правильных ответов
+        // Можно добавить свистелок (отображать дополнительно вопросы с правильными ответами)
+        // и сделать красивый ASCII-интерфейс, но нет
+        if (null == survey) return;
+        System.out.println(SUMMARY_CAPTION);
+        System.out.println(String.format(TOTAL_SCORE, survey.getScore()));
+        System.out.println(survey.getResult() ? SURVEY_PASSED : SURVEY_FAILED);
+    }
 
     /**
      * Обрабатываем введенный пользователем текст
      *
      * @param question
      */
-    private static void handleAnswer(Question question) {
+    private void handleAnswer(Question question) {
         Scanner sc = new Scanner(System.in);
         boolean isParsed;
         do {
@@ -47,7 +66,7 @@ public class QuestionView {
      *
      * @param question
      */
-    private static void printVariants(MultiVariantQuestion question) {
+    private void printVariants(MultiVariantQuestion question) {
         for (int i = 0; i < question.getAnswers().size(); i++) {
             System.out.println("" + (i + 1) + ": " + question.getAnswers().get(i));
         }
@@ -60,7 +79,7 @@ public class QuestionView {
      * @param inputString
      * @return
      */
-    private static boolean handleInput(Question question, String inputString) {
+    private boolean handleInput(Question question, String inputString) {
         if (StringUtils.isEmpty(inputString)) {
             System.out.println("Answer shouldn't be empty");
             return false;
@@ -87,7 +106,7 @@ public class QuestionView {
      * @param question
      * @return
      */
-    private static boolean checkVariantQuestionRange(String inputString, MultiVariantQuestion question) {
+    private boolean checkVariantQuestionRange(String inputString, MultiVariantQuestion question) {
         if (!NumberUtils.isCreatable(inputString)) {
             return false;
         }
@@ -102,7 +121,7 @@ public class QuestionView {
      * @param question
      * @return
      */
-    private static String decodeVariantAnswer(String inputString, MultiVariantQuestion question) {
+    private String decodeVariantAnswer(String inputString, MultiVariantQuestion question) {
         return question.getAnswers().get(NumberUtils.toInt(inputString) - 1);
     }
 }
