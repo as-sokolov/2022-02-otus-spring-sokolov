@@ -20,6 +20,7 @@ class GenreDaoJdbcTest {
 
     private static final int EXPECTED_GENRES_COUNT = 1;
     private static final int EXISTING_GENRES_ID = 1;
+    private static final int INSERT_GENRES_ID = 3;
     private static final String EXISTING_GENRE_NAME = "Детектив";
     private static final String INSERT_GENRE_NAME = "Фантастика";
 
@@ -61,9 +62,10 @@ class GenreDaoJdbcTest {
     @Test
     @Order(4)
     void shouldCorrectDeleteGenreById() {
-        Genre expectedGenre = new Genre(EXISTING_GENRES_ID, EXISTING_GENRE_NAME);
-        assertThat(genreDao.getById(EXISTING_GENRES_ID)).isEqualTo(expectedGenre);
-        genreDao.deleteById(EXISTING_GENRES_ID);
-        assertThat(genreDao.getById(EXISTING_GENRES_ID)).isNull();
+        shouldInsertGenre();
+        Genre expectedGenre = new Genre(INSERT_GENRES_ID, INSERT_GENRE_NAME);
+        assertThat(genreDao.getById(INSERT_GENRES_ID)).isEqualTo(expectedGenre);
+        genreDao.deleteById(INSERT_GENRES_ID);
+        assertThat(genreDao.getById(INSERT_GENRES_ID)).isNull();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.otus.spring.domain.Author;
+import ru.otus.spring.domain.Genre;
 import java.util.List;
 
 @DisplayName("Dao для работы с авторами должно ")
@@ -21,6 +22,7 @@ class AuthorDaoJdbcTest {
 
     private static final int EXPECTED_AUTHORS_COUNT = 1;
     private static final int EXISTING_AUTHORS_ID = 1;
+    private static final int INSERT_AUTHORS_ID = 3;
     private static final String EXISTING_AUTHOR_NAME = "Маша";
     private static final String INSERT_AUTHOR_NAME = "Иван";
 
@@ -62,9 +64,10 @@ class AuthorDaoJdbcTest {
     @Test
     @Order(4)
     void shouldCorrectDeleteAuthorById() {
-        Author expectedAuthor = new Author(EXISTING_AUTHORS_ID, EXISTING_AUTHOR_NAME);
-        assertThat(authorDao.getById(EXISTING_AUTHORS_ID)).isEqualTo(expectedAuthor);
-        authorDao.deleteById(EXISTING_AUTHORS_ID);
-        assertThat(authorDao.getById(EXISTING_AUTHORS_ID)).isNull();
+        shouldInsertAuthor();
+        Author expectedAuthor = new Author(INSERT_AUTHORS_ID, INSERT_AUTHOR_NAME);
+        assertThat(authorDao.getById(INSERT_AUTHORS_ID)).isEqualTo(expectedAuthor);
+        authorDao.deleteById(INSERT_AUTHORS_ID);
+        assertThat(authorDao.getById(INSERT_AUTHORS_ID)).isNull();
     }
 }

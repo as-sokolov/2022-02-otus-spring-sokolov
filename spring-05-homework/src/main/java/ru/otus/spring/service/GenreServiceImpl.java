@@ -29,6 +29,7 @@ public class GenreServiceImpl implements GenreService {
         return genreDao.getById(id);
     }
 
+    @Override
     public List<Genre> getAllGenres() {
         return genreDao.getAll();
     }
