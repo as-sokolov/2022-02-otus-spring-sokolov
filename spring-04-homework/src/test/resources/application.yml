@@ -1,0 +1,14 @@
+spring:
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  shell:
+    interactive:
+      enabled: false
+  main:
+    allow-circular-references: true
+
+survey:
+  filename:   i18n/questions_ru.csv
+  passScore:  3
+  locale: ru-RU
