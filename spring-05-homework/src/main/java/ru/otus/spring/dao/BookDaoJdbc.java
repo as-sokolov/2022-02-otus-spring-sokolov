@@ -1,8 +1,9 @@
 package ru.otus.spring.dao;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,53 +27,53 @@ public class BookDaoJdbc implements BookDao {
 
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
 
-    private final AuthorDao authorDao;
-
-    public BookDaoJdbc(NamedParameterJdbcOperations namedParameterJdbcOperations, AuthorDao authorDao) {
+    public BookDaoJdbc(NamedParameterJdbcOperations namedParameterJdbcOperations) {
         this.namedParameterJdbcOperations = namedParameterJdbcOperations;
-        this.authorDao = authorDao;
     }
 
     @Override
     public Book getById(long id) {
-        Book book;
         try {
+            BookRowCallbackHandler bookRowCallbackHandler = new BookRowCallbackHandler();
             Map<String, Object> params = Collections.singletonMap("id", id);
-            book = namedParameterJdbcOperations.queryForObject(
-                    "select bk.id, bk.name, gn.id genre_id, gn.name genre_name from books bk left join genres gn on bk.genre_id = gn.id where bk.id = :id", params,
-                    new BookMapper()
-            );
-        } catch (EmptyResultDataAccessException ex) {
+            namedParameterJdbcOperations.query(
+                    "select bk.id, bk.name, gn.id genre_id, gn.name genre_name, au.id author_id, au.name author_name from books bk join genres gn " +
+                            "on bk.genre_id = gn.id join books_authors ba on bk.id = ba.book_id join authors au on ba.author_id = au.id where bk.id = :id",
+                    params, bookRowCallbackHandler);
+            List<Book> books = bookRowCallbackHandler.getBooksList();
+
+            // вместо этого if можно было бы добавить в catch ArrayIndexOutOfBoundsException, но исключения обрабатываются сильно дольше
+            // обычного кода, поэтому пусть здесь будет проверка
+            if (books.size() == 0) {
+                log.debug("Запись с id {} не найдена", id);
+                return null;
+            }
+
+            return books.get(0);
+        } catch (DataAccessException ex) {
             log.debug("Запись с id {} не найдена", id);
             return null;
         }
-        addBookAuthors(book);
-        return book;
     }
 
     @Override
     public List<Book> getAll() {
         List<Book> bookList;
         try {
-            bookList = namedParameterJdbcOperations.query("select bk.id, bk.name, gn.id genre_id, gn.name genre_name from books bk left join genres gn on" +
-                    " bk.genre_id = gn.id", new BookMapper());
+            BookRowCallbackHandler bookRowCallbackHandler = new BookRowCallbackHandler();
+            namedParameterJdbcOperations.query("select bk.id, bk.name, gn.id genre_id, gn.name genre_name, au.id author_id, au.name author_name from books bk join genres gn " +
+                    "on bk.genre_id = gn.id join books_authors ba on bk.id = ba.book_id join authors au on ba.author_id = au.id", bookRowCallbackHandler);
+            bookList = bookRowCallbackHandler.getBooksList();
         } catch (EmptyResultDataAccessException ex) {
             log.debug("Записей не найдено");
             return new ArrayList<>();
         }
 
-        for (Book book : bookList) {
-            addBookAuthors(book);
-        }
         return bookList;
     }
 
     @Override
     public Long insert(Book book) {
-        if (!validateBook(book)) {
-            log.error("Указаны некорректные значения параметров книги {}", book);
-            return null;
-        }
 
         KeyHolder kh = new GeneratedKeyHolder();
         namedParameterJdbcOperations.update("insert into books (name, genre_id) values (:name, :genre_id)",
@@ -91,10 +92,6 @@ public class BookDaoJdbc implements BookDao {
 
     @Override
     public void update(Book book) {
-        if (!validateBook(book)) {
-            log.error("Указаны некорректные значения параметров книги {}", book);
-            return;
-        }
 
         namedParameterJdbcOperations.update("update books set name = :name, genre_id = :genre_id where id = :id",
                 new MapSqlParameterSource().addValue("name", book.getName())
@@ -124,47 +121,27 @@ public class BookDaoJdbc implements BookDao {
         );
     }
 
-    private static class BookMapper implements RowMapper<Book> {
+
+    private static class BookRowCallbackHandler implements RowCallbackHandler {
+        private Map<Long, Book> books = new HashMap<>();
+
+        public List<Book> getBooksList() {
+            return List.of(books.values().toArray(new Book[0]));
+        }
+
         @Override
-        public Book mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new Book(
-                    resultSet.getLong("id"), resultSet.getString("name"), new ArrayList<>(),
-                    new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre_name")));
-        }
-    }
-
-    private Book addBookAuthors(Book book) {
-        List<Long> authorIdList = namedParameterJdbcOperations.queryForList(
-                "select ba.author_id id from books bk " +
-                        "join books_authors ba on bk.id = ba.book_id where bk.id = :id", Collections.singletonMap("id", book.getId()), Long.class);
-        for (Long id : authorIdList) {
-            book.getAuthorList().add(authorDao.getById(id));
-        }
-        return book;
-    }
-
-    private boolean validateBook(Book book) {
-        // Проверяем, существует ли выбранный жанр
-        Integer genreCount = book.getGenre() == null ? 0 :
-                namedParameterJdbcOperations.queryForObject("select count (*) from genres gn where gn.id = :id",
-                        new MapSqlParameterSource().addValue("id", book.getGenre().getId()), Integer.class);
-        if (genreCount != 1) {
-            return false;
-        }
-
-        // Проверяем, существует ли автор
-        for (Author author : book.getAuthorList()) {
-            if (author != null && author.getId() != 0) {
-                // проверяем, существует ли автор с таким id
-                Integer authorCount =
-                        namedParameterJdbcOperations.queryForObject("select count (*) from authors au where au.id = :id",
-                                new MapSqlParameterSource().addValue("id", author.getId()), Integer.class);
-                if (authorCount != 1) {
-                    return false;
-                }
+        public void processRow(ResultSet resultSet) throws SQLException {
+            // если книги еще нет, добавляем ее в Map
+            if (!books.containsKey(resultSet.getLong("id"))) {
+                books.put(resultSet.getLong("id"), new Book(
+                        resultSet.getLong("id"), resultSet.getString("name"), new ArrayList<>(),
+                        new Genre(resultSet.getLong("genre_id"), resultSet.getString("genre_name"))));
             }
+
+            // берем из книг нужную, добавляем одного автора
+            books.get(resultSet.getLong("id")).getAuthorList().add(new Author(resultSet.getLong("author_id"), resultSet.getString("author_name")));
         }
-        return true;
     }
+
 }
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 @DisplayName("Dao для работы с книгами должно ")
 @JdbcTest
-@Import({BookDaoJdbc.class, AuthorDaoJdbc.class})
+@Import({BookDaoJdbc.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BookDaoJdbcTest {
 
