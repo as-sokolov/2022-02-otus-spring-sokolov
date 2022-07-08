@@ -1,14 +1,13 @@
 package ru.otus.spring.repositories;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import ru.otus.spring.models.Author;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
 
-@Repository
+@Service
 @Slf4j
 public class AuthorRepositoryJpa implements AuthorRepository {
 
@@ -22,23 +21,12 @@ public class AuthorRepositoryJpa implements AuthorRepository {
 
     @Override
     public Author getById(long id) {
-        try {
-            return em.find(Author.class, id);
-        } catch (Exception ex) {
-            log.debug("Запись с id {} не найдена", id);
-            return null;
-        }
+        return em.find(Author.class, id);
     }
 
     @Override
     public List<Author> getAll() {
-        try {
-            // Проблемы N+1 у этой сущносит не должно быть
-            return em.createQuery("select a from Author a", Author.class).getResultList();
-        } catch (Exception ex) {
-            log.debug("Записей не найдено");
-            return new ArrayList<>();
-        }
+        return em.createQuery("select a from Author a", Author.class).getResultList();
     }
 
     @Override

@@ -16,7 +16,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Genre addGenre(Genre genre) {
         return genreRepository.save(genre);
     }
@@ -28,13 +28,11 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Genre getGenre(Long id) {
         return genreRepository.getById(id);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Genre> getAllGenres() {
         return genreRepository.getAll();
     }

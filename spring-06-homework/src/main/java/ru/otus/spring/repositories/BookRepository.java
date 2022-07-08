@@ -13,14 +13,4 @@ public interface BookRepository {
     Book getById(long id);
 
     void deleteById(long id);
-
-    // Операции с комментариями разместил здесь
-    // т.к. по заданию это зависимая сущность
-    // и в отрыве от книги не имеет смысла
-
-    Comment saveComment(long bookId, Comment comment);
-
-    List<Comment> getAllCommentsByBookId(long bookId);
-
-    void deleteCommentById(long commentId);
 }

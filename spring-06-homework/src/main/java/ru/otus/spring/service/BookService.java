@@ -9,15 +9,11 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    void saveBook(Book book);
+    Book addBook(Book book);
 
     Book getBook(Long id);
 
     List<Book> getAllBooks();
 
-    Comment saveComment(long bookId, Comment comment);
-
-    List<Comment> getAllCommentsByBookId(long bookId);
-
-    void deleteCommentById(long commentId);
+    Book updateBook(Book book);
 }

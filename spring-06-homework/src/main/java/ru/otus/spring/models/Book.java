@@ -1,9 +1,10 @@
 package ru.otus.spring.models;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,11 +19,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "books")
 public class Book {
@@ -33,22 +35,30 @@ public class Book {
     @Column(name="id")
     private long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
     // Список авторов обычно не слишком большой. Это наиболее часто используемая информация о книге, поэтому
     // читаем при каждой выборке
-    @ManyToMany(targetEntity = Author.class, fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(targetEntity = Author.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "books_authors", joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id"))
+    @Fetch(FetchMode.JOIN)
     private List<Author> authorList;
 
     // Жанр, как и список авторов, важная информация о книге. Читаем сразу
-    @ManyToOne(targetEntity = Genre.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Genre.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "genre_id")
+    @Fetch(FetchMode.JOIN)
     private Genre genre;
 
-    @OneToMany(orphanRemoval = true, targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id")
+    @Fetch(FetchMode.SUBSELECT)
     private List<Comment> commentList;
+
+    public Book() {
+        authorList = new ArrayList<>();
+        commentList = new ArrayList<>();
+    }
 }

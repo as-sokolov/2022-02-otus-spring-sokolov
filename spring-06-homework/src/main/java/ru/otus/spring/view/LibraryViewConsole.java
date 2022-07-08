@@ -171,7 +171,7 @@ public class LibraryViewConsole implements LibraryView {
         System.out.println("Введите текст комменатрия");
         Scanner sc = new Scanner(System.in);
         try {
-            return new Comment(0, sc.nextLine());
+            return new Comment(0, sc.nextLine(), null);
         } catch (Exception ex) {
             log.error("Введено некорректное значение комментария", ex);
             System.out.println("Введено некорректное значение комментария");

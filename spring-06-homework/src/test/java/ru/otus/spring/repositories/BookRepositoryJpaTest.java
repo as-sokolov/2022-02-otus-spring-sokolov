@@ -26,7 +26,6 @@ public class BookRepositoryJpaTest {
 
     private static final int EXPECTED_BOOKS_COUNT = 1;
     private static final int EXISTING_BOOKS_ID = 1;
-    private static final int EXISTING_BOOKS_COMMENT_SIZE = 2;
     private static final String EXISTING_BOOK_NAME = "Убийство в отблесках мониторов";
     private static final String INSERT_BOOK_NAME = "Приключения Алисы в стране Spring";
 
@@ -74,16 +73,6 @@ public class BookRepositoryJpaTest {
         assertThat(bookRepositoryJpa.getById(EXISTING_BOOKS_ID)).usingRecursiveComparison().isEqualTo(updatedBook);
     }
 
-    @DisplayName("добавлять комментарий по id книги")
-    @Test
-    @Order(5)
-    void shouldCorrectAddCommentBookById() {
-        assertThat(bookRepositoryJpa.getById(EXISTING_BOOKS_ID).getCommentList().size()).isEqualTo(EXISTING_BOOKS_COMMENT_SIZE);
-        bookRepositoryJpa.saveComment(EXISTING_BOOKS_ID, new Comment(0, "Comment text"));
-        assertThat(bookRepositoryJpa.getById(EXISTING_BOOKS_ID).getCommentList().size()).isEqualTo(EXISTING_BOOKS_COMMENT_SIZE + 1);
-    }
-
-
     @DisplayName("удалять заданную книгу по ее id")
     @Test
     @Order(6)
@@ -101,8 +90,8 @@ public class BookRepositoryJpaTest {
         authors.add(new Author(2, "Иван"));
         Book book = new Book(1, isExistedBook ? EXISTING_BOOK_NAME : INSERT_BOOK_NAME, authors, new Genre(1, "Детектив"), new ArrayList<>());
         List<Comment> commentList = new ArrayList<>();
-        commentList.add(0, new Comment(1, "Книга норм"));
-        commentList.add(1, new Comment(2, "Так себе"));
+        commentList.add(0, new Comment(1, "Книга норм", book));
+        commentList.add(1, new Comment(2, "Так себе", book));
         book.getCommentList().addAll(commentList);
         return book;
     }

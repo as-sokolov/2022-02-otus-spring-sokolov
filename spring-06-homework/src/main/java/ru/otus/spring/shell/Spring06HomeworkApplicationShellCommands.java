@@ -8,6 +8,7 @@ import ru.otus.spring.models.Comment;
 import ru.otus.spring.models.Genre;
 import ru.otus.spring.service.AuthorService;
 import ru.otus.spring.service.BookService;
+import ru.otus.spring.service.CommentService;
 import ru.otus.spring.service.GenreService;
 import ru.otus.spring.view.LibraryView;
 
@@ -17,13 +18,16 @@ public class Spring06HomeworkApplicationShellCommands {
     private final BookService bookService;
     private final AuthorService authorService;
     private final GenreService genreService;
+    private final CommentService commentService;
     private final LibraryView libraryView;
 
-    public Spring06HomeworkApplicationShellCommands(BookService bookService, AuthorService authorService, GenreService genreService, LibraryView libraryView) {
+    public Spring06HomeworkApplicationShellCommands(BookService bookService, AuthorService authorService, GenreService genreService, LibraryView libraryView,
+     CommentService commentService                                               ) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.genreService = genreService;
         this.libraryView = libraryView;
+        this.commentService = commentService;
     }
 
     @ShellMethod(value = "Print all authors", key = {"printauthors", "pa"})
@@ -111,7 +115,7 @@ public class Spring06HomeworkApplicationShellCommands {
     public void addBook() {
         Book book = libraryView.getBook();
         if (null != book) {
-            bookService.saveBook(book);
+            bookService.addBook(book);
         }
     }
 
@@ -121,7 +125,7 @@ public class Spring06HomeworkApplicationShellCommands {
         Book book = libraryView.getBook();
         if (null != book) {
             book.setId(id);
-            bookService.saveBook(book);
+            bookService.updateBook(book);
         }
     }
 
@@ -130,15 +134,7 @@ public class Spring06HomeworkApplicationShellCommands {
         Long bookId = libraryView.getId();
         Comment comment = libraryView.getComment();
         if (null != comment) {
-            bookService.saveComment(bookId, comment);
-        }
-    }
-
-    @ShellMethod(value="Get all book comments", key = {"printcomments", "pc"})
-    public void printComments() {
-        Long bookId = libraryView.getId();
-        if (null != bookId) {
-            libraryView.printAllComments(bookService.getAllCommentsByBookId(bookId));
+            commentService.saveComment(bookId, comment);
         }
     }
 
@@ -147,7 +143,7 @@ public class Spring06HomeworkApplicationShellCommands {
         Long id = libraryView.getId();
 
         if (null != id) {
-            bookService.deleteCommentById(id);
+            commentService.deleteCommentById(id);
         }
     }
 
