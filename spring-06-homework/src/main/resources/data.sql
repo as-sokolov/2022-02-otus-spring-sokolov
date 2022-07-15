@@ -1,0 +1,10 @@
+insert into AUTHORS (id, name) (select nextval('authors_seq'), 'Маша' from dual);
+insert into AUTHORS (id, name) (select nextval('authors_seq'), 'Иван' from dual);
+insert into AUTHORS (id, name) (select nextval('authors_seq'), 'Петя' from dual);
+insert into GENRES (id, name) (select nextval('genres_seq'), 'Детектив' from dual);
+insert into GENRES (id, name) (select nextval('genres_seq'), 'Фантастика' from dual);
+insert into BOOKS (id, name, GENRE_ID) (select nextval('books_seq'), 'Убийство в отблесках мониторов', gn.id from genres gn where gn.name = 'Детектив');
+insert into COMMENTS (id, text, book_id) (select nextval('comments_seq'), 'Книга норм', bk.id from books bk where bk.name = 'Убийство в отблесках мониторов');
+insert into COMMENTS (id, text, book_id) (select nextval('comments_seq'), 'Так себе', bk.id from books bk where bk.name = 'Убийство в отблесках мониторов');
+insert into BOOKS_AUTHORS (book_id, author_id) values (1,1);
+insert into BOOKS_AUTHORS (book_id, author_id) values (1,2);
