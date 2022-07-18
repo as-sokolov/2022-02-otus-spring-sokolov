@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Добавление книги</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<script src="../validate-book.js"></script>
+
+<form id="add-form" action="books-add.html" th:method="post" th:action="@{/books/add}" th:object="${book}" onsubmit="return validate()">
+    <h3>Новая книга:</h3>
+    <div class="row">
+        <label for="book-name-input">Наименование:</label>
+        <input id="book-name-input" name="name" type="text" value="" th:value="*{name}"/>
+    </div>
+    <div class="row">
+        <label for="dropDownListGenre">Жанр:</label>
+        <select class="form-control" id="dropDownListGenre" th:field="*{genre.id}">
+            <option value="0" disabled>Выберите жанр</option>
+            <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option>
+        </select>
+    </div>
+    <div class="row">
+        <label for="dropDownListAuthors">Авторы:</label>
+        <select class="form-control" id="dropDownListAuthors" th:field="*{authorList}" multiple="multiple">
+            <option value="0" disabled>Выберите авторов</option>
+            <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+        </select>
+    </div>
+    <div class="row">
+        <button type="submit">Добавить</button>
+        <a href="books-list.html" th:href="@{/books/}"><button type="button">Отменить</button></a>
+    </div>
+</form>
+
+</body>
+</html>

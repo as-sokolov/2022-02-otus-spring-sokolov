@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Библиотека имени Льва Толстого</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .persons {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .persons tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .persons td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<h3>Библиотека имени Льва Толстого</h3>
+<p>
+<a href="genres-list.html" th:href="@{/genres/}">Справочник жанров</a><br>
+<a href="authors-list.html" th:href="@{/authors/}">Справочник авторов</a><br>
+<a href="books-list.html" th:href="@{/books/}">Список книг</a><br>
+</p>
+
+</body>
+</html>
