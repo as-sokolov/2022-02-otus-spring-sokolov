@@ -23,21 +23,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public Book getBook(Long id) {
+        return bookRepository.getById(id);
+    }
+
+    @Override
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    @Override
     @Transactional
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Book getBook(Long id) {
-        return bookRepository.getBookById(id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
     }
 
     @Override

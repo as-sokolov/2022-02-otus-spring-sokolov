@@ -6,6 +6,7 @@ import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Comment;
 import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.repositories.CommentRepository;
+import java.util.List;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -34,6 +35,11 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteCommentById(long commentId) {
         commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public List<Comment> getComments(Long bookId) {
+        return commentRepository.getAllByBookId(bookId);
     }
 
 }
