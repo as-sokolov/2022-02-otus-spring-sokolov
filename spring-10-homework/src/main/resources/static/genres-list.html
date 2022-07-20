@@ -26,25 +26,33 @@
     <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(function () {
-                fetch('/api/genre')
-                    .then(response => response.json())
-                    .then(json => addGenres(json))
+            getGenres();
         });
 
-        function addGenres(json) {
+        function getGenres() {
+                fetch('/api/genre')
+                    .then(response => response.json())
+                    .then(json => parseGenres(json));
+        }
+
+        function parseGenres(json) {
             let html = '';
             if (json.length > 0) {
                 json.forEach(function(genre) {
                     html = `${html}<tr><td> ${genre.id} </td>
                             <td>${genre.name}</td>
-                            <td><form action="/api/genre/delete?id=${genre.id}" method="delete" >
-                                        <button type="submit" id="submitButton">Удалить</button>
-                                    </form>
+                            <td><button type="submit" id="submitButton" onclick="deleteGenre(${genre.id})">Удалить</button>
                             </td></tr>`;
                 });
             }
             const genreContainer = document.getElementById("genreContainer")
             genreContainer.innerHTML = html;
+        }
+
+        function deleteGenre(id) {
+            fetch(`/api/genre?id=${id}`, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getGenres()}});
         }
 
     </script>

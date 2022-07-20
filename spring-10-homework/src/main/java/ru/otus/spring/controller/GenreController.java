@@ -30,28 +30,25 @@ public class GenreController {
     }
 
     @PostMapping("/api/genre")
-    public String saveGenre(Genre genre, Model model) {
+    public String saveGenre(Genre genre) {
         try {
             genreService.addGenre(genre);
         } catch (DataIntegrityViolationException ex) {
             log.error("GenreController.saveGenre exception ", ex);
-            model.addAttribute("error", String.format("Жанр с наименованием %s уже существует ", genre.getName()));
-            return "error";
+            return String.format("Жанр с наименованием %s уже существует ", genre.getName());
         }
-
-        return "redirect:/genres/";
+        return "";
     }
 
 
     @DeleteMapping("/api/genre")
-    public String deleteGenre(@RequestParam("id") Long id, Model model) {
+    public String deleteGenre(@RequestParam("id") Long id) {
         try {
             genreService.deleteGenre(id);
         } catch (DataIntegrityViolationException ex) {
             log.error("GenreController.deleteGenre exception ", ex);
-            model.addAttribute("error", String.format("Нельзя удалить жанр c id %s, пока он используется для одной из книг", id));
-            return "error";
+            return String.format("Нельзя удалить жанр c id %s, пока он используется для одной из книг", id);
         }
-        return "redirect:/genres/";
+        return "";
     }
 }

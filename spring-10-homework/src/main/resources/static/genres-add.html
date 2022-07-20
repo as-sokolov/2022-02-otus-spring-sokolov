@@ -21,22 +21,27 @@
             margin-top: 10px;
         }
     </style>
+    <script src="../validate-genre.js"></script>
+    <script>
+        function addGenre() {
+            const genreName = document.getElementById("genre-name-input").value;
+            fetch('/api/genre', {method : 'POST', body : `genreName:${genreName}`})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {window.location.href="/genres-list.html";}});
+        }
+    </script>
 </head>
 <body>
-<script src="../validate-genre.js"></script>
-
-<form id="add-form" action="genres-add.html" th:method="post" th:action="@{/genres/add}" th:object="${genre}" onsubmit="return validate()">
     <h3>Новый жанр:</h3>
     <div class="row">
         <label for="genre-name-input">Наименование:</label>
-        <input id="genre-name-input" name="name" type="text" value="" th:value="*{name}"/>
+        <input id="genre-name-input" type="text"/>
     </div>
 
     <div class="row">
-        <button type="submit">Добавить</button>
-        <a href="genres-list.html" th:href="@{/genres/}"><button type="button">Отменить</button></a>
+        <button type="submit" onclick="addGenre()">Добавить</button>
+        <a href="genres-list.html"><button type="button">Отменить</button></a>
     </div>
-</form>
 
 </body>
 </html>
