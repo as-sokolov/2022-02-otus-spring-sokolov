@@ -40,7 +40,6 @@
         <td th:text="${genre.name}">Детектив</td>
         <td>
             <form action="#" th:action="@{/genres/delete(id=${genre.id})}" th:method="delete" >
-                <input type="hidden" name="_method" value="delete" />
                 <button type="submit" id="submitButton">Удалить</button>
             </form>
         </td>
