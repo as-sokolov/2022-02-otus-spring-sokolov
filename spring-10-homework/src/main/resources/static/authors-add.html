@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Добавление автора</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<script src="../validate-author.js"></script>
+
+<form id="add-form" action="authors-add.html" th:method="post" th:action="@{/authors/add}" th:object="${author}" onsubmit="return validate()">
+    <h3>Новый автор:</h3>
+    <div class="row">
+        <label for="author-name-input">Наименование:</label>
+        <input id="author-name-input" name="name" type="text" value="" th:value="*{name}"/>
+    </div>
+
+    <div class="row">
+        <button type="submit">Добавить</button>
+        <a href="authors-list.html" th:href="@{/authors/}"><button type="button">Отменить</button></a>
+    </div>
+</form>
+
+</body>
+</html>
