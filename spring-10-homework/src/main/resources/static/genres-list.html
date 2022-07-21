@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Справочник жанров</title>
@@ -50,11 +50,10 @@
         }
 
         function deleteGenre(id) {
-            fetch(`/api/genre?id=${id}`, {method : 'DELETE'})
+            fetch(`/api/genre/${id}`, {method : 'DELETE'})
                 .then(response => response.text())
                 .then(text => {if (text !== '') {alert(text)} else {getGenres()}});
         }
-
     </script>
 </head>
 <body>

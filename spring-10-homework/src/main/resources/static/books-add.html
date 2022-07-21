@@ -21,35 +21,123 @@
             margin-top: 10px;
         }
     </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            getGenres();
+            getAuthors();
+        });
+
+        function getGenres() {
+            fetch('/api/genre')
+                .then(response => response.json())
+                .then(json => parseGenres(json));
+        }
+
+        function getAuthors() {
+            fetch('/api/author')
+                .then(response => response.json())
+                .then(json => parseAuthors(json));
+        }
+
+        function parseGenres(json) {
+            let html = '<option value="0" disabled>Выберите жанр</option>';
+            if (json.length > 0) {
+                json.forEach(function(genre) {
+                    html = `${html}<option value="${genre.id}">${genre.name}</option>`;
+                });
+            }
+            const dropDownListGenre = document.getElementById("dropDownListGenre")
+            dropDownListGenre.innerHTML = html;
+            dropDownListGenre.selectedIndex=0;
+        }
+
+        function parseAuthors(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function(author) {
+                    html = `${html}<option value="${author.id}">${author.name}</option>`;
+                });
+            }
+            const dropDownListAuthors = document.getElementById("dropDownListAuthors")
+            dropDownListAuthors.innerHTML = html;
+        }
+
+        function addBook() {
+            if (!validate()) return;
+
+            var selectedAuthors = [...document.getElementById('dropDownListAuthors').options]
+                .filter(option => option.selected)
+                .map(option => { return {"id" : option.value } });
+
+
+            var book = {
+                'name' : document.getElementById("book-name-input").value,
+                'genre' : { 'id' : document.getElementById("dropDownListGenre").value},
+                'authorList' : selectedAuthors
+            }
+
+            fetch('/api/book', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)
+            }).then(response => response.text())
+                .then(text => {
+                    if (text !== '') {
+                        alert(text)
+                    } else {
+                        window.location.href = "/books-list.html";
+                    }
+                });
+        }
+        function validate()
+        {
+            if (document.getElementById("book-name-input").value === "")
+            {
+                alert("Заполните наименование книги");
+                return false;
+            }
+            if (document.getElementById("dropDownListGenre").value === "0")
+            {
+                alert("Выберите жанр");
+                return false;
+            }
+
+            if (document.getElementById("dropDownListAuthors").value === "") //Не выбрано ничего
+            {
+                alert("Выберите авторов");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </head>
 <body>
-<script src="../validate-book.js"></script>
 
-<form id="add-form" action="books-add.html" th:method="post" th:action="@{/books/add}" th:object="${book}" onsubmit="return validate()">
+
     <h3>Новая книга:</h3>
     <div class="row">
         <label for="book-name-input">Наименование:</label>
-        <input id="book-name-input" name="name" type="text" value="" th:value="*{name}"/>
+        <input id="book-name-input" name="name" type="text"/>
     </div>
     <div class="row">
         <label for="dropDownListGenre">Жанр:</label>
-        <select class="form-control" id="dropDownListGenre" th:field="*{genre.id}">
-            <option value="0" disabled>Выберите жанр</option>
-            <option th:each="genre : ${genres}" th:value="${genre.id}" th:text="${genre.name}"></option>
+        <select class="form-control" id="dropDownListGenre">
         </select>
     </div>
     <div class="row">
         <label for="dropDownListAuthors">Авторы:</label>
-        <select class="form-control" id="dropDownListAuthors" th:field="*{authorList}" multiple="multiple">
-            <option value="0" disabled>Выберите авторов</option>
-            <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"></option>
+        <select class="form-control" id="dropDownListAuthors" multiple="multiple">
         </select>
     </div>
     <div class="row">
-        <button type="submit">Добавить</button>
-        <a href="books-list.html" th:href="@{/books/}"><button type="button">Отменить</button></a>
+        <button type="submit" onclick="addBook()">Добавить</button>
+        <a href="books-list.html"><button type="button">Отменить</button></a>
     </div>
-</form>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Добавление жанра</title>
@@ -21,27 +21,53 @@
             margin-top: 10px;
         }
     </style>
-    <script src="../validate-genre.js"></script>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function addGenre() {
-            const genreName = document.getElementById("genre-name-input").value;
-            fetch('/api/genre', {method : 'POST', body : `genreName:${genreName}`})
-                .then(response => response.text())
-                .then(text => {if (text !== '') {alert(text)} else {window.location.href="/genres-list.html";}});
+            if (!validate()) return;
+
+            fetch('/api/genre', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: document.getElementById("genre-name-input").value})
+            }).then(response => response.text())
+                .then(text => {
+                    if (text !== '') {
+                        alert(text)
+                    } else {
+                        window.location.href = "/genres-list.html";
+                    }
+                });
+        }
+
+        function validate()
+        {
+            if (document.getElementById("genre-name-input").value === "")
+            {
+                alert("Заполните наименование жанра");
+                return false;
+            }
+
+            return true;
         }
     </script>
 </head>
 <body>
-    <h3>Новый жанр:</h3>
-    <div class="row">
-        <label for="genre-name-input">Наименование:</label>
-        <input id="genre-name-input" type="text"/>
-    </div>
+<h3>Новый жанр:</h3>
+<div class="row">
+    <label for="genre-name-input">Наименование:</label>
+    <input id="genre-name-input" type="text"/>
+</div>
 
-    <div class="row">
-        <button type="submit" onclick="addGenre()">Добавить</button>
-        <a href="genres-list.html"><button type="button">Отменить</button></a>
-    </div>
+<div class="row">
+    <button type="submit" onclick="addGenre()">Добавить</button>
+    <a href="genres-list.html">
+        <button type="button">Отменить</button>
+    </a>
+</div>
 
 </body>
 </html>

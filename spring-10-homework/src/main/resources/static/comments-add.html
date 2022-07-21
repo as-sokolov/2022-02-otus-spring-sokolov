@@ -23,7 +23,19 @@
     </style>
 </head>
 <body>
-<script src="../validate-comment.js"></script>
+<script>
+    function validate()
+    {
+        if (document.getElementById("comment-text-input").value === "")
+        {
+            alert("Заполните текст комментария");
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
 
 <form id="add-form" action="comments-add.html" th:method="post" th:action="@{/comments/add}" th:object="${comment}" onsubmit="return validate()">
     <h3>Новый комментарий:</h3>

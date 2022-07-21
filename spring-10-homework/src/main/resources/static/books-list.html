@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Список книг</title>
@@ -23,6 +23,56 @@
             width: 50px;
         }
     </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            getBooks();
+        });
+
+        function getBooks() {
+            fetch('/api/book')
+                .then(response => response.json())
+                .then(json => parseBooks(json));
+        }
+
+        function parseBooks(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function(book) {
+                    html = `${html}<tr><td> ${book.id} </td>
+                            <td>${book.name}</td>
+                            <td>${book.genre.name}</td>`;
+
+                    html = `${html}<td><ol>`;
+                    book.authorList.forEach(function(author) {
+                        html = `${html}<li>${author.name}</li>`;
+                    });
+                    html = `${html}</ol></td>`;
+
+                    html = `${html}<td><ul>`;
+                    book.commentList.forEach(function(comment) {
+                        html = `${html}<li>${comment.text}</li>`;
+                    });
+                    html = `${html}</ul></td>`;
+
+                    html =`${html}<td>
+                                <a href="/comments-list.html?id=${book.id}"><button type="button" id="commentButton">Управление комментариями</button></a>
+                                <a href="/books-edit.html?id=${book.id}"><button type="button" id="editButton">Редактирование книги</button></a>
+                                <button type="submit" id="submitButton" onclick="deleteBook(${book.id})">Удалить</button>
+                        </td>`;
+                });
+            }
+            const bookContainer = document.getElementById("bookContainer")
+            bookContainer.innerHTML = html;
+        }
+
+        function deleteBook(id) {
+            fetch(`/api/book/${id}`, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getBooks()}});
+
+        }
+    </script>
 </head>
 <body>
 <a href="/">На главную страницу</a>
@@ -37,37 +87,9 @@
         <th>Комментарии</th>
     </tr>
     </thead>
-    <tbody>
-    <tr th:each="book : ${books}">
-        <td th:text="${book.id}">1</td>
-        <td th:text="${book.name}">Карлсон, который живет на крыше</td>
-        <td th:text="${book.genre.name}">Детектив</td>
-        <td>
-            <ol>
-                <li th:each="author : ${book.authorList}" th:text="${author.name}"></li>
-            </ol>
-        </td>
-        <td>
-            <ul>
-                <li th:each="comment : ${book.commentList}" th:text="${comment.text}"></li>
-            </ul>
-        </td>
-        <td>
-            <form action="#" th:action="@{/comments/}" th:method="get">
-                <input type="hidden" name="id" th:value="${book.id}">
-                <button type="submit" th:method="get" id="commentButton">Управление комментариями</button>
-            </form>
-            <form action="#" th:action="@{/books/edit}" th:method="get">
-                <input type="hidden" name="id" th:value="${book.id}">
-                <button type="submit" th:method="get"  id="editButton">Редактирование книги</button>
-            </form>
-            <form action="#" th:action="@{/books/delete(id=${book.id})}" th:method="delete" >
-                <button type="submit" id="submitButton">Удалить книгу</button>
-            </form>
-        </td>
-    </tr>
+    <tbody id="bookContainer">
     </tbody>
 </table>
-<a href="books-add.html" th:href="@{/books/add}">Добавить книгу</a>
+<a href="books-add.html">Добавить книгу</a>
 </body>
 </html>

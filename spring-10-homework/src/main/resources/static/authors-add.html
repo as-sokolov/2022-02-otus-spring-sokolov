@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Добавление автора</title>
@@ -21,22 +21,43 @@
             margin-top: 10px;
         }
     </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function addAuthor() {
+            if (!validate()) return;
+
+            fetch('/api/author', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({name: document.getElementById("author-name-input").value})
+            }).then(window.location.href = "/authors-list.html");
+        }
+
+        function validate()
+        {
+            if (document.getElementById("author-name-input").value === "")
+            {
+                alert("Заполните имя автора");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </head>
 <body>
-<script src="../validate-author.js"></script>
-
-<form id="add-form" action="authors-add.html" th:method="post" th:action="@{/authors/add}" th:object="${author}" onsubmit="return validate()">
     <h3>Новый автор:</h3>
     <div class="row">
         <label for="author-name-input">Наименование:</label>
-        <input id="author-name-input" type="text" value=""/>
+        <input id="author-name-input" type="text"/>
     </div>
 
     <div class="row">
-        <button type="submit">Добавить</button>
+        <button type="submit" onclick="addAuthor()">Добавить</button>
         <a href="authors-list.html"><button type="button">Отменить</button></a>
     </div>
-</form>
-
 </body>
 </html>

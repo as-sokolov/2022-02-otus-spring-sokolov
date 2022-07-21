@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>Справочник авторовs</title>
+    <title>Справочник авторов</title>
     <style type="text/css">
         body {
             padding: 50px;
@@ -23,6 +23,38 @@
             width: 50px;
         }
     </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            getAuthors();
+        });
+
+        function getAuthors() {
+            fetch('/api/author')
+                .then(response => response.json())
+                .then(json => parseAuthors(json));
+        }
+
+        function parseAuthors(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function(author) {
+                    html = `${html}<tr><td> ${author.id} </td>
+                            <td>${author.name}</td>
+                            <td><button type="submit" id="submitButton" onclick="deleteAuthor(${author.id})">Удалить</button>
+                            </td></tr>`;
+                });
+            }
+            const authorContainer = document.getElementById("authorContainer")
+            authorContainer.innerHTML = html;
+        }
+
+        function deleteAuthor(id) {
+            fetch(`/api/author/${id}`, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getAuthors()}});
+        }
+    </script>
 </head>
 <body>
 <a href="/">На главную страницу</a>
@@ -34,18 +66,9 @@
         <th>Наименование</th>
     </tr>
     </thead>
-    <tbody>
-    <tr th:each="author : ${authors}">
-        <td th:text="${author.id}">1</td>
-        <td th:text="${author.name}">Чарльз Буковски</td>
-        <td>
-            <form action="#" th:action="@{/authors/delete(id=${author.id})}" th:method="delete" >
-                <button type="submit" id="submitButton">Удалить</button>
-            </form>
-        </td>
-    </tr>
+    <tbody  id = "authorContainer">
     </tbody>
 </table>
-<a href="authors-add.html" th:href="@{/authors/add}">Добавить автора</a>
+<a href="authors-add.html">Добавить автора</a>
 </body>
 </html>

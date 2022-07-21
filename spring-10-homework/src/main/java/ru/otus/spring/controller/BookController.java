@@ -1,20 +1,22 @@
 package ru.otus.spring.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.otus.spring.models.Book;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import ru.otus.spring.dto.BookDto;
 import ru.otus.spring.service.AuthorService;
 import ru.otus.spring.service.BookService;
 import ru.otus.spring.service.GenreService;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @Slf4j
 public class BookController {
 
@@ -28,44 +30,35 @@ public class BookController {
         this.authorService = authorService;
     }
 
-    @GetMapping("/books/")
-    public String listBook(Model model) {
-        List<Book> books = bookService.getAllBooks();
-        model.addAttribute("books", books);
-        return "books-list";
+    @GetMapping("/api/book")
+    public List<BookDto> listBook() {
+       return bookService.getAllBooks().stream().map(BookDto::toDto).collect(Collectors.toList());
     }
 
-    @GetMapping("/books/add")
-    public String addBook(Model model) {
-        model.addAttribute("genres", genreService.getAllGenres());
-        model.addAttribute("authors", authorService.getAllAuthors());
-        model.addAttribute("book", new Book());
-        return "books-add";
+    @PostMapping("/api/book")
+    public void saveBook(@RequestBody BookDto bookDto) {
+        bookService.addBook(BookDto.fromDto(bookDto));
     }
 
-    @PostMapping("/books/add")
-    public String saveBook(Book book) {
-        bookService.addBook(book);
-        return "redirect:/books/";
+    @GetMapping("/api/book/{id}")
+    public BookDto editBook(@PathVariable(value = "id") Long id) {
+        return BookDto.toDto(bookService.getBook(id));
     }
 
-    @GetMapping("/books/edit")
-    public String editBook(@RequestParam(value = "id") Long id, Model model) {
-        model.addAttribute("genres", genreService.getAllGenres());
-        model.addAttribute("authors", authorService.getAllAuthors());
-        model.addAttribute("book", bookService.getBook(id));
-        return "books-edit";
+    @PutMapping("/api/book/{id}")
+    public void updateBook(@PathVariable("id") Long id, @RequestBody BookDto bookDto) {
+        bookService.updateBook(BookDto.fromDto(bookDto));
     }
 
-    @PostMapping("/books/edit")
-    public String updateBook(@ModelAttribute("book") Book book) {
-        bookService.updateBook(book);
-        return "redirect:/books/";
-    }
+    @DeleteMapping("/api/book/{id}")
+    public String deleteBook(@PathVariable("id") Long id) {
+        try {
+            bookService.deleteBook(id);
+        } catch (DataIntegrityViolationException ex) {
+            log.error("BookController.deleteBook exception ", ex);
+            return String.format("При удалении книги произошла ошибка", id);
+        }
+        return "";
 
-    @DeleteMapping("/books/delete")
-    public String deleteBook(@RequestParam("id") Long id) {
-        bookService.deleteBook(id);
-        return "redirect:/books/";
     }
 }

@@ -24,6 +24,70 @@
 </head>
 <body>
 <script src="../validate-book.js"></script>
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(function () {
+        //getBook(jQuery.url.param("id"));
+        getGenres();
+        getAuthors();
+    });
+
+    function getBook(id) {
+        fetch(`/api/book/${id}`)
+            .then(response => response.json())
+            .then(json => parseBook(json));
+    }
+
+    function getGenres() {
+        fetch('/api/genre')
+            .then(response => response.json())
+            .then(json => parseGenres(json));
+    }
+
+    function getAuthors() {
+        fetch('/api/author')
+            .then(response => response.json())
+            .then(json => parseAuthors(json));
+    }
+
+    function parseBooks(json) {
+        let html = '';
+        if (json.length > 0) {
+            json.forEach(function(book) {
+                html = `${html}<tr><td> ${book.id} </td>
+                            <td>${book.name}</td>
+                            <td>${book.genre.name}</td>`;
+
+                html = `${html}<td><ol>`;
+                book.authorList.forEach(function(author) {
+                    html = `${html}<li>${author.name}</li>`;
+                });
+                html = `${html}</ol></td>`;
+
+                html = `${html}<td><ul>`;
+                book.commentList.forEach(function(comment) {
+                    html = `${html}<li>${comment.text}</li>`;
+                });
+                html = `${html}</ul></td>`;
+
+                html =`${html}<td>
+                                <a href="/comments-list.html?id=${book.id}"><button type="button" id="commentButton">Управление комментариями</button></a>
+                                <a href="/books-edit.html?id=${book.id}"><button type="button" id="editButton">Редактирование книги</button></a>
+                                <button type="submit" id="submitButton" onclick="deleteBook(${book.id})">Удалить</button>
+                        </td>`;
+            });
+        }
+        const bookContainer = document.getElementById("bookContainer")
+        bookContainer.innerHTML = html;
+    }
+
+    function deleteBook(id) {
+        fetch(`/api/book/${id}`, {method : 'DELETE'})
+            .then(response => response.text())
+            .then(text => {if (text !== '') {alert(text)} else {getBooks()}});
+    }
+</script>
+
 
 <form id="add-form" action="books-edit.html" th:method="post" th:action="@{/books/edit}" th:object="${book}" onsubmit="return validate()">
     <h3>Изменение книги:</h3>
