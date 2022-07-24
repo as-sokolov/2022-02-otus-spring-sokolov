@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Список комментариев</title>
@@ -23,6 +23,48 @@
             width: 50px;
         }
     </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results == null) {
+                return null;
+            }
+            return decodeURI(results[1]) || 0;
+        }
+
+        $(function () {
+            getComments();
+        });
+
+        function getComments() {
+            fetch("/api/comment?bookId=" + $.urlParam('id'))
+                .then(response => response.json())
+                .then(json => parseComments(json));
+        }
+
+        function parseComments(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function (comment) {
+                    html = `${html}<tr><td> ${comment.id} </td>
+            <td>${comment.text}</td>
+            <td><button type="submit" id="submitButton" onclick="deleteComment(${comment.id})">Удалить комментарий</button>
+            </td></tr>`;
+                });
+            }
+            const commentContainer = document.getElementById("commentContainer")
+            commentContainer.innerHTML = html;
+            document.getElementById("commentAdd").href="comments-add.html?id="+ $.urlParam('id');
+        }
+
+        function deleteComment(id) {
+            fetch(`/api/comment/${id}`, {method: 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getComments()}});
+        }
+
+    </script>
 </head>
 <body>
 <a href="/">На главную страницу</a>
@@ -34,18 +76,9 @@
         <th>Текст</th>
     </tr>
     </thead>
-    <tbody>
-    <tr th:each="comment : ${comments}">
-        <td th:text="${comment.id}">1</td>
-        <td th:text="${comment.text}">Книга прекрасна!</td>
-        <td>
-            <form action="#" th:action="@{/comments/delete(id=${comment.id}, bookId=${bookId})}" th:method="delete" >
-                <button type="submit" id="submitButton">Удалить комментарий</button>
-            </form>
-        </td>
-    </tr>
+    <tbody id="commentContainer">
     </tbody>
 </table>
-<a href="comments-add.html" th:href="@{/comments/add(bookId=${bookId})}">Добавить комментарий</a>
+<a id = "commentAdd">Добавить комментарий</a>
 </body>
 </html>

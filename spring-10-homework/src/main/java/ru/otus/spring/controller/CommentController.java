@@ -1,20 +1,22 @@
 package ru.otus.spring.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.otus.spring.models.Book;
-import ru.otus.spring.models.Comment;
+import org.springframework.web.bind.annotation.RestController;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.CommentDto;
 import ru.otus.spring.service.CommentService;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
-@Controller
+@RestController
 @Slf4j
 public class CommentController {
 
@@ -25,36 +27,25 @@ public class CommentController {
     }
 
 
-    @GetMapping("/comments/")
-    public String listComments(@RequestParam(name = "id") Long bookId, Model model) {
-        List<Comment> comments = commentService.getComments(bookId);
-        model.addAttribute("comments", comments);
-        model.addAttribute("bookId", bookId);
-        return "comments-list";
+    @GetMapping("/api/comment")
+    public List<CommentDto> listComments(@RequestParam(name = "bookId") Long bookId) {
+        return commentService.getComments(bookId).stream().map(CommentDto::toDto).collect(Collectors.toList());
     }
 
-    @DeleteMapping("/comments/delete")
-    public String deleteComment(@RequestParam(name = "id") Long id, @RequestParam(name = "bookId") Long bookId, RedirectAttributes attributes) {
-        commentService.deleteCommentById(id);
-        attributes.addAttribute("id", bookId);
-        return "redirect:/comments/";
+    @DeleteMapping("/api/comment/{id}")
+    public String deleteComment(@PathVariable(name = "id") Long id) {
+        try {
+            commentService.deleteCommentById(id);
+        } catch (DataIntegrityViolationException ex) {
+            log.error("CommentController.deleteComment exception ", ex);
+            return String.format("При удалении комментария с id = %s произошла ошибка", id);
+        }
+        return "";
+
     }
 
-    @GetMapping("/comments/add")
-    public String addComment(@RequestParam(name = "bookId") Long bookId, Model model) {
-        Comment comment = new Comment();
-        comment.setBook(new Book());
-        comment.getBook().setId(bookId);
-        model.addAttribute("comment", comment);
-        return "comments-add";
+    @PostMapping("/api/comment")
+    public void saveComment(@RequestParam(name = "bookId") Long bookId, @RequestBody CommentDto comment) {
+        commentService.saveComment(bookId, CommentDto.fromDto(comment));
     }
-
-    @PostMapping("/comments/add")
-    public String saveComment(Comment comment, RedirectAttributes attributes) {
-        commentService.saveComment(comment.getBook().getId(), comment);
-        attributes.addAttribute("id", comment.getBook().getId());
-        return "redirect:/comments/";
-    }
-
-
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.models.Book;
 import ru.otus.spring.service.AuthorService;
 import ru.otus.spring.service.BookService;
 import ru.otus.spring.service.GenreService;
@@ -47,7 +48,9 @@ public class BookController {
 
     @PutMapping("/api/book/{id}")
     public void updateBook(@PathVariable("id") Long id, @RequestBody BookDto bookDto) {
-        bookService.updateBook(BookDto.fromDto(bookDto));
+        Book book = BookDto.fromDto(bookDto);
+        book.setId(id);
+        bookService.updateBook(book);
     }
 
     @DeleteMapping("/api/book/{id}")
@@ -56,9 +59,8 @@ public class BookController {
             bookService.deleteBook(id);
         } catch (DataIntegrityViolationException ex) {
             log.error("BookController.deleteBook exception ", ex);
-            return String.format("При удалении книги произошла ошибка", id);
+            return String.format("При удалении книги c id = %s произошла ошибка", id);
         }
         return "";
-
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <title>Добавление комментария</title>
@@ -21,34 +21,56 @@
             margin-top: 10px;
         }
     </style>
-</head>
-<body>
-<script>
-    function validate()
-    {
-        if (document.getElementById("comment-text-input").value === "")
-        {
-            alert("Заполните текст комментария");
-            return false;
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function returnToCommentPage() {
+            window.location.href = "/comments-list.html?id=" + $.urlParam('id')
         }
 
-        return true;
-    }
+        async function addComment() {
+            if (!validate()) return;
 
-</script>
+            await fetch("/api/comment?bookId=" + $.urlParam('id'), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'text': document.getElementById("comment-text-input").value})
+            });
+            returnToCommentPage();
+        }
 
-<form id="add-form" action="comments-add.html" th:method="post" th:action="@{/comments/add}" th:object="${comment}" onsubmit="return validate()">
-    <h3>Новый комментарий:</h3>
-    <div class="row">
-        <label for="comment-text-input">Текст:</label>
-        <input id="comment-text-input" name="text" type="text" value="" th:value="*{text}"/>
-    </div>
-    <input type="hidden" th:field="${comment.book.id}" name="bookId" th:value="${comment.book.id}">
-    <div class="row">
-        <button type="submit">Добавить</button>
-        <a href="comments-list.html" th:href="@{/comments/(id=${comment.book.id})}"><button type="button">Отменить</button></a>
-    </div>
-</form>
+        function validate() {
+            if (document.getElementById("comment-text-input").value === "") {
+                alert("Заполните текст комментария");
+                return false;
+            }
 
+            return true;
+        }
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results == null) {
+                return null;
+            }
+            return decodeURI(results[1]) || 0;
+        }
+    </script>
+
+</head>
+<body>
+<h3>Новый комментарий:</h3>
+<div class="row">
+    <label for="comment-text-input">Наименование:</label>
+    <input id="comment-text-input" type="text"/>
+</div>
+
+<div class="row">
+    <button type="submit" onclick="addComment()">Добавить</button>
+    <button type="button" onclick="returnToCommentPage()">Отменить</button>
+</div>
 </body>
+
 </html>
