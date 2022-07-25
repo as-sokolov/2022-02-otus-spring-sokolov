@@ -52,7 +52,7 @@ public class Book {
     @Fetch(FetchMode.JOIN)
     private Genre genre;
 
-    @OneToMany(orphanRemoval = true, targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(orphanRemoval = true, targetEntity = Comment.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     @Fetch(FetchMode.SUBSELECT)
     private List<Comment> commentList;

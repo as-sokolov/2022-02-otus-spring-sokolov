@@ -1,15 +1,15 @@
 package ru.otus.spring.service;
 
-import ru.otus.spring.models.Genre;
+import ru.otus.spring.dto.GenreDto;
 import java.util.List;
 
 public interface GenreService {
     
-    Genre addGenre(Genre genre);
+    GenreDto addGenre(GenreDto genre);
 
     void deleteGenre(Long id);
 
-    Genre getGenre(Long id);
+    GenreDto getGenre(Long id);
 
-    List<Genre> getAllGenres();
+    List<GenreDto> getAllGenres();
 }

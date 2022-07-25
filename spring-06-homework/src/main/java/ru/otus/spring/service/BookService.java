@@ -1,19 +1,17 @@
 package ru.otus.spring.service;
 
-import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.models.Book;
-import ru.otus.spring.models.Comment;
+import ru.otus.spring.dto.BookDto;
 import java.util.List;
 
 public interface BookService {
 
     void deleteBook(Long id);
 
-    Book addBook(Book book);
+    BookDto addBook(BookDto book);
 
-    Book getBook(Long id);
+    BookDto getBook(Long id);
 
-    List<Book> getAllBooks();
+    List<BookDto> getAllBooks();
 
-    Book updateBook(Book book);
+    BookDto updateBook(BookDto book);
 }

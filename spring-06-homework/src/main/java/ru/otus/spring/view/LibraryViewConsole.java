@@ -4,6 +4,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.util.StringUtils;
 import org.springframework.stereotype.Service;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.GenreDto;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Comment;
@@ -20,37 +24,37 @@ public class LibraryViewConsole implements LibraryView {
     public static final String EMPTY_RECORD = "Пустая запись";
 
     @Override
-    public void printAllAuthors(List<Author> authorList) {
+    public void printAllAuthors(List<AuthorDto> authorList) {
         if (authorList == null || authorList.isEmpty()) {
             System.out.println("Пустой список авторов");
             return;
         }
         System.out.println("Cписок авторов:");
-        for (Author author: authorList) {
+        for (AuthorDto author: authorList) {
             printAuthor(author);
         }
     }
 
     @Override
-    public void printAllBooks(List<Book> bookList) {
+    public void printAllBooks(List<BookDto> bookList) {
         if (bookList == null || bookList.isEmpty()) {
             System.out.println("Пустой список книг");
             return;
         }
         System.out.println("Cписок книг:");
-        for (Book book : bookList) {
+        for (BookDto book : bookList) {
             printBook(book);
         }
     }
 
     @Override
-    public void printAllGenres(List<Genre> genreList) {
+    public void printAllGenres(List<GenreDto> genreList) {
         if (genreList == null || genreList.isEmpty()) {
             System.out.println("Пустой список жанров");
             return;
         }
         System.out.println("Cписок жанров:");
-        for (Genre genre : genreList) {
+        for (GenreDto genre : genreList) {
             printGenre(genre);
         }
     }
@@ -69,12 +73,12 @@ public class LibraryViewConsole implements LibraryView {
     }
 
     @Override
-    public void printAuthor(Author author) {
+    public void printAuthor(AuthorDto author) {
         System.out.println(author == null ? EMPTY_RECORD : String.format("id автора: %s, ФИО автора: %s", author.getId(), author.getName()));
     }
 
     @Override
-    public void printBook(Book book) {
+    public void printBook(BookDto book) {
         if (book == null) {
             System.out.println(EMPTY_RECORD);
             return;
@@ -89,17 +93,17 @@ public class LibraryViewConsole implements LibraryView {
     }
 
     @Override
-    public void printGenre(Genre genre) {
+    public void printGenre(GenreDto genre) {
         System.out.println(genre == null ? EMPTY_RECORD : String.format("id жанра: %s, Наименование жанра: %s", genre.getId(), genre.getName()));
     }
 
 
     @Override
-    public Author getAuthor() {
+    public AuthorDto getAuthor() {
         System.out.println("Введите имя автора");
         Scanner sc = new Scanner(System.in);
         try {
-            return new Author(0, sc.nextLine());
+            return new AuthorDto(0, sc.nextLine());
         } catch (Exception ex) {
             log.error("Введено некорректное значение имени автора", ex);
             System.out.println("Введено некорректное значение имени автора");
@@ -108,11 +112,11 @@ public class LibraryViewConsole implements LibraryView {
     }
 
     @Override
-    public Genre getGenre() {
+    public GenreDto getGenre() {
         System.out.println("Введите название жанра");
         Scanner sc = new Scanner(System.in);
         try {
-            return new Genre(0, sc.nextLine());
+            return new GenreDto(0, sc.nextLine());
         } catch (Exception ex) {
             log.error("Введено некорректное значение названия жанра", ex);
             System.out.println("Введено некорректное значение названия жанра");
@@ -121,7 +125,7 @@ public class LibraryViewConsole implements LibraryView {
     }
 
     @Override
-    public Book getBook() {
+    public BookDto getBook() {
         try {
             System.out.println("Введите название книги");
             Scanner sc = new Scanner(System.in);
@@ -136,12 +140,12 @@ public class LibraryViewConsole implements LibraryView {
             if (!StringUtils.isNullOrEmpty(authorIds)) {
                 parsedIds = authorIds.split(" ");
             }
-            List<Author> authorList = new ArrayList<>();
+            List<AuthorDto> authorList = new ArrayList<>();
 
             for (String parsedId : parsedIds) {
-                authorList.add(new Author(Long.parseLong(parsedId), null));
+                authorList.add(new AuthorDto(Long.parseLong(parsedId), null));
             }
-            return new Book(0, bookName, authorList, new Genre(genre_id, null), new ArrayList<>());
+            return new BookDto(bookName, authorList, new GenreDto(genre_id, null), new ArrayList<>());
 
         } catch (Exception ex) {
             log.error("Введено некорректное значение параметра", ex);
@@ -151,27 +155,27 @@ public class LibraryViewConsole implements LibraryView {
     }
 
     @Override
-    public void printAllComments(List<Comment> commentsList) {
+    public void printAllComments(List<CommentDto> commentsList) {
         if (commentsList == null || commentsList.isEmpty()) {
             System.out.println("Пустой список комментариев");
             return;
         }
         System.out.println("Cписок комментариев:");
-        for (Comment comment : commentsList) {
+        for (CommentDto comment : commentsList) {
             printComment(comment);
         }
     }
 
-    public void printComment(Comment comment) {
+    public void printComment(CommentDto comment) {
         System.out.println(comment == null ? EMPTY_RECORD : String.format("id комментария: %s, Текст комментария: %s", comment.getId(), comment.getText()));
     }
 
     @Override
-    public Comment getComment() {
+    public CommentDto getComment() {
         System.out.println("Введите текст комменатрия");
         Scanner sc = new Scanner(System.in);
         try {
-            return new Comment(0, sc.nextLine(), null);
+            return new CommentDto(sc.nextLine());
         } catch (Exception ex) {
             log.error("Введено некорректное значение комментария", ex);
             System.out.println("Введено некорректное значение комментария");

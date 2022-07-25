@@ -1,30 +1,30 @@
 package ru.otus.spring.view;
 
-import ru.otus.spring.models.Author;
-import ru.otus.spring.models.Book;
-import ru.otus.spring.models.Comment;
-import ru.otus.spring.models.Genre;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.GenreDto;
 import java.util.List;
 
 public interface LibraryView {
-    void printAllAuthors(List<Author> authorList);
-    void printAllBooks(List<Book> bookList);
-    void printAllGenres(List<Genre> genreList);
+    void printAllAuthors(List<AuthorDto> authorList);
+    void printAllBooks(List<BookDto> bookList);
+    void printAllGenres(List<GenreDto> genreList);
 
-    void printAuthor(Author author);
-    void printGenre(Genre genre);
-    void printBook(Book book);
+    void printAuthor(AuthorDto author);
+    void printGenre(GenreDto genre);
+    void printBook(BookDto book);
 
     Long getId();
 
-    Author getAuthor();
+    AuthorDto getAuthor();
 
-    Genre getGenre();
+    GenreDto getGenre();
 
-    Book getBook();
+    BookDto getBook();
 
 
-    void printAllComments(List<Comment> commentsList);
+    void printAllComments(List<CommentDto> commentsList);
 
-    Comment getComment();
+    CommentDto getComment();
 }

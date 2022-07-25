@@ -2,10 +2,10 @@ package ru.otus.spring.shell;
 
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
-import ru.otus.spring.models.Author;
-import ru.otus.spring.models.Book;
-import ru.otus.spring.models.Comment;
-import ru.otus.spring.models.Genre;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.CommentDto;
+import ru.otus.spring.dto.GenreDto;
 import ru.otus.spring.service.AuthorService;
 import ru.otus.spring.service.BookService;
 import ru.otus.spring.service.CommentService;
@@ -97,7 +97,7 @@ public class Spring06HomeworkApplicationShellCommands {
 
     @ShellMethod(value = "Add Genre", key = {"addgenre", "ag"})
     public void addGenre() {
-        Genre genre = libraryView.getGenre();
+        GenreDto genre = libraryView.getGenre();
         if (null != genre) {
             genreService.addGenre(genre);
         }
@@ -105,7 +105,7 @@ public class Spring06HomeworkApplicationShellCommands {
 
     @ShellMethod(value = "Add author", key = {"addauthor", "aa"})
     public void addAuthor() {
-        Author author = libraryView.getAuthor();
+        AuthorDto author = libraryView.getAuthor();
         if (null != author) {
             authorService.addAuthor(author);
         }
@@ -113,7 +113,7 @@ public class Spring06HomeworkApplicationShellCommands {
 
     @ShellMethod(value = "Add book", key = {"addbook", "ab"})
     public void addBook() {
-        Book book = libraryView.getBook();
+        BookDto book = libraryView.getBook();
         if (null != book) {
             bookService.addBook(book);
         }
@@ -122,7 +122,7 @@ public class Spring06HomeworkApplicationShellCommands {
     @ShellMethod(value = "Update book", key = {"updatebook", "ub"})
     public void updateBook() {
         Long id = libraryView.getId();
-        Book book = libraryView.getBook();
+        BookDto book = libraryView.getBook();
         if (null != book) {
             book.setId(id);
             bookService.updateBook(book);
@@ -132,7 +132,7 @@ public class Spring06HomeworkApplicationShellCommands {
     @ShellMethod(value="Add comment", key = {"addcomment", "ac"})
     public void addComment() {
         Long bookId = libraryView.getId();
-        Comment comment = libraryView.getComment();
+        CommentDto comment = libraryView.getComment();
         if (null != comment) {
             commentService.saveComment(bookId, comment);
         }
@@ -144,6 +144,15 @@ public class Spring06HomeworkApplicationShellCommands {
 
         if (null != id) {
             commentService.deleteCommentById(id);
+        }
+    }
+
+    @ShellMethod(value="Get comment by book id", key = {"printcomments", "pcbid"})
+    public void printComments() {
+        Long id = libraryView.getId();
+
+        if (null != id) {
+            libraryView.printAllComments(commentService.getCommentsByBookId(id));
         }
     }
 

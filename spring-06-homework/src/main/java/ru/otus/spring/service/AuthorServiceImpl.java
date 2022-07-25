@@ -2,9 +2,10 @@ package ru.otus.spring.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.spring.dto.AuthorDto;
 import ru.otus.spring.repositories.AuthorRepository;
-import ru.otus.spring.models.Author;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
@@ -17,8 +18,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    public Author addAuthor(Author author) {
-        return authorRepository.save(author);
+    public AuthorDto addAuthor(AuthorDto author) {
+        return AuthorDto.toDto(authorRepository.save(AuthorDto.fromDto(author)));
     }
 
     @Override
@@ -28,12 +29,12 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author getAuthor(Long id) {
-        return authorRepository.getById(id);
+    public AuthorDto getAuthor(Long id) {
+        return AuthorDto.toDto(authorRepository.getById(id));
     }
 
     @Override
-    public List<Author> getAllAuthors() {
-        return authorRepository.getAll();
+    public List<AuthorDto> getAllAuthors() {
+        return authorRepository.getAll().stream().map(AuthorDto::toDto).collect(Collectors.toList());
     }    
 }

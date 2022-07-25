@@ -2,12 +2,14 @@ package ru.otus.spring.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.spring.models.Author;
+import ru.otus.spring.dto.AuthorDto;
+import ru.otus.spring.dto.BookDto;
 import ru.otus.spring.repositories.AuthorRepository;
 import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.repositories.GenreRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -30,40 +32,40 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public Book getBook(Long id) {
-        return bookRepository.getById(id);
+    public BookDto getBook(Long id) {
+        return BookDto.toDto(bookRepository.getById(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Book> getAllBooks() {
-        return bookRepository.getAll();
+    public List<BookDto> getAllBooks() {
+        return bookRepository.getAll().stream().map(BookDto::toDto).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Book updateBook(Book book) {
-        Book updatedBook = getBook(book.getId());
+    public BookDto updateBook(BookDto book) {
+        Book updatedBook = BookDto.fromDto(getBook(book.getId()));
         if (updatedBook == null) {
             return null;
         }
         clearBookParams(updatedBook);
         fillBookParmas(updatedBook, book.getName(), book.getAuthorList(), book.getGenre().getId());
         bookRepository.save(updatedBook);
-        return updatedBook;
+        return BookDto.toDto(updatedBook);
     }
 
     @Override
     @Transactional
-    public Book addBook(Book book) {
+    public BookDto addBook(BookDto book) {
         Book newBook = new Book();
         fillBookParmas(newBook, book.getName(), book.getAuthorList(), book.getGenre().getId());
         bookRepository.save(newBook);
-        return newBook;
+        return BookDto.toDto(newBook);
     }
 
-    private void fillBookParmas(Book book, String name, List<Author> authors, Long genreId) {
-        for (Author author : authors) {
+    private void fillBookParmas(Book book, String name, List<AuthorDto> authors, Long genreId) {
+        for (AuthorDto author : authors) {
             book.getAuthorList().add(authorRepository.getById(author.getId()));
         }
         book.setGenre(genreRepository.getById(genreId));
