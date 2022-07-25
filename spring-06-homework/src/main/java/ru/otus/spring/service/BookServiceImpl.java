@@ -1,9 +1,12 @@
 package ru.otus.spring.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.spring.dto.AuthorDto;
 import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.models.Author;
+import ru.otus.spring.models.Genre;
 import ru.otus.spring.repositories.AuthorRepository;
 import ru.otus.spring.repositories.BookRepository;
 import ru.otus.spring.models.Book;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
@@ -45,7 +49,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookDto updateBook(BookDto book) {
-        Book updatedBook = BookDto.fromDto(getBook(book.getId()));
+        Book updatedBook = bookRepository.getById(book.getId());
         if (updatedBook == null) {
             return null;
         }
@@ -65,10 +69,20 @@ public class BookServiceImpl implements BookService {
     }
 
     private void fillBookParmas(Book book, String name, List<AuthorDto> authors, Long genreId) {
-        for (AuthorDto author : authors) {
-            book.getAuthorList().add(authorRepository.getById(author.getId()));
+        for (AuthorDto authorDto : authors) {
+            Author author = authorRepository.getById(authorDto.getId());
+            if (author == null) {
+                log.error("Некорректное значение id={} автора", authorDto.getId());
+                throw new RuntimeException(String.format("Некорректное значение id=%s автора", authorDto.getId()));
+            }
+            book.getAuthorList().add(author);
         }
-        book.setGenre(genreRepository.getById(genreId));
+        Genre genre =genreRepository.getById(genreId);
+        if (genre == null) {
+            log.error("Некорректное значение id={} жанра", genreId);
+            throw new RuntimeException(String.format("Некорректное значение id=%s жанра", genreId));
+        }
+        book.setGenre(genre);
         book.setName(name);
     }
 
