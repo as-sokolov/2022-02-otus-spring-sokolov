@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.otus.spring.dto.BookDto;
 import ru.otus.spring.models.Book;
-import ru.otus.spring.service.AuthorService;
 import ru.otus.spring.service.BookService;
-import ru.otus.spring.service.GenreService;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,13 +20,9 @@ import java.util.stream.Collectors;
 public class BookController {
 
     private final BookService bookService;
-    private final GenreService genreService;
-    private final AuthorService authorService;
 
-    public BookController(BookService bookService, GenreService genreService, AuthorService authorService) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.genreService = genreService;
-        this.authorService = authorService;
     }
 
     @GetMapping("/api/book")
