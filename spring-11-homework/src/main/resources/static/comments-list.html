@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Список комментариев</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .comments {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .comments tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .comments td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results == null) {
+                return null;
+            }
+            return decodeURI(results[1]) || 0;
+        }
+
+        $(function () {
+            getComments();
+        });
+
+        function getComments() {
+            fetch("/api/comment?bookId=" + $.urlParam('id'))
+                .then(response => response.json())
+                .then(json => parseComments(json));
+        }
+
+        function parseComments(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function (comment) {
+                    html = `${html}<tr><td> ${comment.id} </td>
+            <td>${comment.text}</td>
+            <td><button type="submit" id="submitButton" onclick="deleteComment(${comment.id})">Удалить комментарий</button>
+            </td></tr>`;
+                });
+            }
+            const commentContainer = document.getElementById("commentContainer")
+            commentContainer.innerHTML = html;
+            document.getElementById("commentAdd").href="comments-add.html?id="+ $.urlParam('id');
+        }
+
+        function deleteComment(id) {
+            fetch(`/api/comment/${id}`, {method: 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getComments()}});
+        }
+
+    </script>
+</head>
+<body>
+<a href="/">На главную страницу</a>
+<h3>Комментарии:</h3>
+<table class="comments">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Текст</th>
+    </tr>
+    </thead>
+    <tbody id="commentContainer">
+    </tbody>
+</table>
+<a id = "commentAdd">Добавить комментарий</a>
+</body>
+</html>
