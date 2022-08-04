@@ -49,7 +49,7 @@
                 json.forEach(function (comment) {
                     html = `${html}<tr><td> ${comment.id} </td>
             <td>${comment.text}</td>
-            <td><button type="submit" id="submitButton" onclick="deleteComment(${comment.id})">Удалить комментарий</button>
+            <td><button type="submit" id="submitButton" onclick="deleteComment('${comment.id}')">Удалить комментарий</button>
             </td></tr>`;
                 });
             }
@@ -59,7 +59,7 @@
         }
 
         function deleteComment(id) {
-            fetch(`/api/comment/${id}`, {method: 'DELETE'})
+            fetch(`/api/comment/${id}?bookId=` + $.urlParam('id'), {method: 'DELETE'})
                 .then(response => response.text())
                 .then(text => {if (text !== '') {alert(text)} else {getComments()}});
         }

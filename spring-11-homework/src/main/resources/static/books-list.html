@@ -58,7 +58,7 @@
                     html =`${html}<td>
                                 <a href="/comments-list.html?id=${book.id}"><button type="button" id="commentButton">Управление комментариями</button></a>
                                 <a href="/books-edit.html?id=${book.id}"><button type="button" id="editButton">Редактирование книги</button></a>
-                                <button type="submit" id="submitButton" onclick="deleteBook(${book.id})">Удалить</button>
+                                <button type="submit" id="submitButton" onclick="deleteBook('${book.id}')">Удалить</button>
                         </td>`;
                 });
             }

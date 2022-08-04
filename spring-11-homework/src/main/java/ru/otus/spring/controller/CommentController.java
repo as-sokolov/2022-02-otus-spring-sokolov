@@ -2,6 +2,8 @@ package ru.otus.spring.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import ru.otus.spring.dto.BookDto;
 import ru.otus.spring.dto.CommentDto;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.repositories.BookRepository;
@@ -37,28 +40,21 @@ public class CommentController {
     }
 
     @PostMapping("/api/comment")
-    public Mono<Void> saveComment(@RequestParam(name = "bookId") String bookId, @RequestBody CommentDto comment) {
-        bookRepository.findById(bookId)
-                .map(book -> {
+    public Mono<ResponseEntity<Void>> saveComment(@RequestParam(name = "bookId") String bookId, @RequestBody CommentDto comment) {
+        return bookRepository.findById(bookId)
+                .flatMap(book -> {
                     comment.setId(new ObjectId().toString());
                     book.getCommentList().add(CommentDto.fromDto(comment));
-                    bookRepository.save(book);
-                    return Mono.empty();
+                    return bookRepository.save(book).thenReturn(new ResponseEntity<>(HttpStatus.OK));
                 });
-        return Mono.empty();
     }
 
     @DeleteMapping("/api/comment/{id}")
-    public Mono<String> deleteComment(@RequestParam(name = "bookId") String bookId, @PathVariable(name = "id") String id) {
+    public Mono<ResponseEntity<Void>> deleteComment(@RequestParam(name = "bookId") String bookId, @PathVariable(name = "id") String id) {
         return bookRepository.findById(bookId)
-                .map(book -> {
+                .flatMap(book -> {
                     book.getCommentList().removeIf(x -> x.getId().equals(id));
-                    try {
-                        bookRepository.save(book);
-                    } catch (Exception ex) {
-                        return String.format("При удалении комментария с id = %s произошла ошибка", id);
-                    }
-                    return "";
+                    return bookRepository.save(book).thenReturn(new ResponseEntity<>(HttpStatus.OK));
                 });
     }
 }

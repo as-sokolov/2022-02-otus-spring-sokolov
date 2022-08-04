@@ -43,8 +43,6 @@ public class GenreController {
                                 .map(GenreDto::toDto)
                                 .map(res -> ResponseEntity.ok().body(res))
                 );
-
-
     }
 
     @DeleteMapping("/api/genre/{id}")

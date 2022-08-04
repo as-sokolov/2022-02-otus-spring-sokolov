@@ -112,14 +112,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(book)
-        }).then(response => response.text())
-            .then(text => {
-                if (text !== '') {
-                    alert(text)
-                } else {
-                    window.location.href = "/books-list.html";
-                }
-            });
+        }).then(window.location.href = "/books-list.html");
     }
 
     function validate() {

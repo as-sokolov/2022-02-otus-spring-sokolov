@@ -2,6 +2,8 @@ package ru.otus.spring.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.spring.dto.AuthorDto;
 import ru.otus.spring.dto.BookDto;
+import ru.otus.spring.dto.GenreDto;
 import ru.otus.spring.models.Author;
 import ru.otus.spring.models.Book;
 import ru.otus.spring.models.Genre;
@@ -47,44 +50,38 @@ public class BookController {
     }
 
     @DeleteMapping("/api/book/{id}")
-    public Mono<String> deleteBook(@PathVariable("id") String id) {
-        try {
-            bookRepository.deleteById(id);
-            return Mono.just("");
-        } catch (Exception ex) {
-            return Mono.just(String.format("При удалении книги c id = %s произошла ошибка", id));
-        }
+    public Mono<ResponseEntity<Void>> deleteBook(@PathVariable("id") String id) {
+        return bookRepository.deleteById(id).thenReturn(ResponseEntity.ok().build());
     }
 
     @PostMapping("/api/book")
     public Mono<BookDto> saveBook(@RequestBody BookDto bookDto) {
-//        Book newBook = new Book();
-//        Mono<Genre> genreMono = genreRepository.findById(bookDto.getGenre().getId());
-//        Flux<Author> authorsFlux = authorRepository.findAllById(bookDto.getAuthorList().stream().map(AuthorDto::getId).collect(Collectors.toList()));
-//        return Flux.zip(genreMono, authorsFlux, (genre, authors) -> {
-//            newBook.setName(bookDto.getName());
-//            newBook.setGenre(genre);
-//            newBook.setAuthorList((List<Author>) authors);
-//        })
-//        return bookRepository.save(newBook).map(BookDto::toDto);
-        return Mono.just(bookDto);
+        Mono<Genre> genreMono = genreRepository.findById(bookDto.getGenre().getId());
+        Flux<Author> authorsFlux = authorRepository.findAllById(bookDto.getAuthorList().stream().map(AuthorDto::getId).collect(Collectors.toList()));
+        return authorsFlux.collectList().zipWith(genreMono, (authors, genre) -> {
+            Book newBook = new Book();
+            newBook.setName(bookDto.getName());
+            newBook.setGenre(genre);
+            newBook.setAuthorList(authors);
+            return newBook;
+        }).flatMap(bookRepository::save).map(BookDto::toDto);
     }
 
 
     @PutMapping("/api/book/{id}")
-    public Mono<Void> updateBook(@PathVariable("id") String id, @RequestBody BookDto bookDto) {
-//        Book book = BookDto.fromDto(bookDto);
-//        book.setId(id);
-//
-//        bookRepository.findById(id).
-//                map(updateBook -> {
-//                    updateBook.setName(null);
-//                    updateBook.setGenre(null);
-//                    updateBook.getAuthorList().clear();
-//                    fillBookParams(updateBook, bookDto.getName(), bookDto.getAuthorList(), bookDto.getGenre().getId());
-//                    bookRepository.save(updateBook);
-//                    return Mono.empty();
-//                });
-        return Mono.empty();
+    public Mono<BookDto> updateBook(@PathVariable("id") String id, @RequestBody BookDto bookDto) {
+        Mono<Genre> genreMono = genreRepository.findById(bookDto.getGenre().getId());
+        Mono<Book> bookMono = bookRepository.findById(id);
+        Mono<List<Author>> authorsMono =
+                authorRepository.findAllById(bookDto.getAuthorList().stream().map(AuthorDto::getId).collect(Collectors.toList())).collectList();
+        return Mono.zip(authorsMono, bookMono, genreMono).flatMap(
+                data -> {
+                    Book updateBook = data.getT2();
+                    updateBook.setId(id);
+                    updateBook.setName(bookDto.getName());
+                    updateBook.setGenre(data.getT3());
+                    updateBook.setAuthorList(data.getT1());
+                    return bookRepository.save(updateBook);
+                }).map(BookDto::toDto);
     }
 }
