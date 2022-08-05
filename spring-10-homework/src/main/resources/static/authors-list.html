@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Справочник авторов</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .authors {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .authors tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .authors td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            getAuthors();
+        });
+
+        function getAuthors() {
+            fetch('/api/author')
+                .then(response => response.json())
+                .then(json => parseAuthors(json));
+        }
+
+        function parseAuthors(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function(author) {
+                    html = `${html}<tr><td> ${author.id} </td>
+                            <td>${author.name}</td>
+                            <td><button type="submit" id="submitButton" onclick="deleteAuthor(${author.id})">Удалить</button>
+                            </td></tr>`;
+                });
+            }
+            const authorContainer = document.getElementById("authorContainer")
+            authorContainer.innerHTML = html;
+        }
+
+        function deleteAuthor(id) {
+            fetch(`/api/author/${id}`, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getAuthors()}});
+        }
+    </script>
+</head>
+<body>
+<a href="/">На главную страницу</a>
+<h3>Авторы:</h3>
+<table class="authors">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Наименование</th>
+    </tr>
+    </thead>
+    <tbody  id = "authorContainer">
+    </tbody>
+</table>
+<a href="authors-add.html">Добавить автора</a>
+</body>
+</html>
