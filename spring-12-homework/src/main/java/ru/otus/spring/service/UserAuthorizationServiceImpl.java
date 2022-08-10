@@ -2,6 +2,7 @@ package ru.otus.spring.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Service
+@Qualifier("LibraryUserAuthorizationService")
 @Slf4j
 public class UserAuthorizationServiceImpl implements UserDetailsService {
 

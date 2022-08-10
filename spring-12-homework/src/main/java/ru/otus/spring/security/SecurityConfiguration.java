@@ -1,6 +1,7 @@
 package ru.otus.spring.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.otus.spring.service.UserAuthorizationServiceImpl;
@@ -18,10 +20,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${remembermekey}")
     private String remembermekey;
 
-    private final UserAuthorizationServiceImpl userAuthorizationServiceImpl;
+    private final UserDetailsService userDetailsService;
 
-    public SecurityConfiguration(UserAuthorizationServiceImpl userAuthorizationServiceImpl) {
-        this.userAuthorizationServiceImpl = userAuthorizationServiceImpl;
+    public SecurityConfiguration(@Qualifier("LibraryUserAuthorizationService") UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userAuthorizationServiceImpl);
+        auth.userDetailsService(userDetailsService);
     }
 
     @Bean
