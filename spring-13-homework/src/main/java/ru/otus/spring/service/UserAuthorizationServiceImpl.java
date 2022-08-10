@@ -2,6 +2,7 @@ package ru.otus.spring.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +12,7 @@ import ru.otus.spring.models.User;
 import java.util.Collections;
 
 @Service
+@Qualifier("LibraryUserAuthorizationService")
 @Slf4j
 public class UserAuthorizationServiceImpl implements UserDetailsService {
 
