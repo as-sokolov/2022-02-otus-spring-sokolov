@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Список комментариев</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .comments {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .comments tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .comments td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+<a href="/">На главную страницу</a>
+<h3>Комментарии:</h3>
+<table class="comments">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Текст</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="comment : ${comments}">
+        <td th:text="${comment.id}">1</td>
+        <td th:text="${comment.text}">Книга прекрасна!</td>
+        <td>
+            <form action="#" th:action="@{/comments/delete(id=${comment.id}, bookId=${bookId})}" th:method="delete" >
+                <button type="submit" id="submitButton">Удалить комментарий</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a href="../templates/comments-add.html" th:href="@{/comments/add(bookId=${bookId})}">Добавить комментарий</a>
+</body>
+</html>

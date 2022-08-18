@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Добавление комментария</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<script src="../validate-comment.js"></script>
+
+<form id="add-form" action="comments-add.html" th:method="post" th:action="@{/comments/add}" th:object="${comment}"  onsubmit="return validate()">
+    <h3>Новый комментарий:</h3>
+    <div class="row">
+        <label for="comment-text-input">Текст:</label>
+        <input id="comment-text-input" name="text" type="text" value="" th:value="*{text}"/>
+    </div>
+    <input type="hidden" th:field="${comment.book.id}" name="bookId" th:value="${comment.book.id}">
+    <div class="row">
+        <button type="submit">Добавить</button>
+        <a href="comments-list.html" th:href="@{/comments/(id=${comment.book.id})}"><button type="button">Отменить</button></a>
+    </div>
+</form>
+
+</body>
+</html>

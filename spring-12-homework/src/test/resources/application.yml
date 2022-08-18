@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    #initialization-mode: always
+    #data: data.sql
+    sql-script-encoding: UTF-8
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      #schema-locations: schema.sql
+
+  main:
+    allow-circular-references: true
+
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true
+
+remembermekey : "mysupasecretkey"
