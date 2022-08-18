@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Список книг</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            getBooks();
+        });
+
+        function getBooks() {
+            fetch('/api/book')
+                .then(response => response.json())
+                .then(json => parseBooks(json));
+        }
+
+        function parseBooks(json) {
+            let html = '';
+            if (json.length > 0) {
+                json.forEach(function(book) {
+                    html = `${html}<tr><td> ${book.id} </td>
+                            <td>${book.name}</td>
+                            <td>${book.genre.name}</td>`;
+
+                    html = `${html}<td><ol>`;
+                    book.authorList.forEach(function(author) {
+                        html = `${html}<li>${author.name}</li>`;
+                    });
+                    html = `${html}</ol></td>`;
+
+                    html = `${html}<td><ul>`;
+                    book.commentList.forEach(function(comment) {
+                        html = `${html}<li>${comment.text}</li>`;
+                    });
+                    html = `${html}</ul></td>`;
+
+                    html =`${html}<td>
+                                <a href="/comments-list.html?id=${book.id}"><button type="button" id="commentButton">Управление комментариями</button></a>
+                                <a href="/books-edit.html?id=${book.id}"><button type="button" id="editButton">Редактирование книги</button></a>
+                                <button type="submit" id="submitButton" onclick="deleteBook('${book.id}')">Удалить</button>
+                        </td>`;
+                });
+            }
+            const bookContainer = document.getElementById("bookContainer")
+            bookContainer.innerHTML = html;
+        }
+
+        function deleteBook(id) {
+            fetch(`/api/book/${id}`, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getBooks()}});
+
+        }
+    </script>
+</head>
+<body>
+<a href="/">На главную страницу</a>
+<h3>Книги:</h3>
+<table class="books">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Наименование</th>
+        <th>Жанр</th>
+        <th>Авторы</th>
+        <th>Комментарии</th>
+    </tr>
+    </thead>
+    <tbody id="bookContainer">
+    </tbody>
+</table>
+<a href="books-add.html">Добавить книгу</a>
+</body>
+</html>

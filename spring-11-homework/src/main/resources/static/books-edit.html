@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Изменение книги</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(function () {
+        getGenres();
+        getAuthors();
+        getBook($.urlParam('id'));
+    });
+
+    async function getGenres() {
+        await fetch('/api/genre')
+            .then(response => response.json())
+            .then(json => parseGenres(json));
+    }
+
+    async function getAuthors() {
+        await fetch('/api/author')
+            .then(response => response.json())
+            .then(json => parseAuthors(json));
+    }
+
+    function getBook(id) {
+        fetch(`/api/book/${id}`)
+            .then(response => response.json())
+            .then(book => parseBook(book));
+    }
+
+    function parseBook(book) {
+        var genre = [book.genre.id.toString()];
+        var authors = [];
+        book.authorList.forEach(function (author) {
+            authors.push(author.id.toString());
+        });
+        setSelectedIndex(document.getElementById("dropDownListGenre"), genre);
+        setSelectedIndex(document.getElementById("dropDownListAuthors"), authors);
+        document.getElementById("book-name-input").value = book.name;
+    }
+
+    function setSelectedIndex(element, values) {
+        for (var i = 0; i < element.options.length; i++) {
+            element.options[i].selected = values.indexOf(element.options[i].value) >= 0;
+        }
+    }
+
+    function parseGenres(json) {
+        let html = '<option value="0" disabled>Выберите жанр</option>';
+        if (json.length > 0) {
+            json.forEach(function (genre) {
+                html = `${html}<option value="${genre.id}">${genre.name}</option>`;
+            });
+        }
+        const dropDownListGenre = document.getElementById("dropDownListGenre")
+        dropDownListGenre.innerHTML = html;
+        dropDownListGenre.selectedIndex = 0;
+    }
+
+    function parseAuthors(json) {
+        let html = '';
+        if (json.length > 0) {
+            json.forEach(function (author) {
+                html = `${html}<option value="${author.id}">${author.name}</option>`;
+            });
+        }
+        const dropDownListAuthors = document.getElementById("dropDownListAuthors")
+        dropDownListAuthors.innerHTML = html;
+    }
+
+    function updateBook(id) {
+        if (!validate()) return;
+
+        var selectedAuthors = [...document.getElementById('dropDownListAuthors').options]
+            .filter(option => option.selected)
+            .map(option => {
+                return {"id": option.value}
+            });
+
+
+        var book = {
+            'name': document.getElementById("book-name-input").value,
+            'genre': {'id': document.getElementById("dropDownListGenre").value},
+            'authorList': selectedAuthors
+        }
+
+        fetch(`/api/book/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(book)
+        }).then(window.location.href = "/books-list.html");
+    }
+
+    function validate() {
+        if (document.getElementById("book-name-input").value === "") {
+            alert("Заполните наименование книги");
+            return false;
+        }
+        if (document.getElementById("dropDownListGenre").value === "0") {
+            alert("Выберите жанр");
+            return false;
+        }
+
+        if (document.getElementById("dropDownListAuthors").value === "") //Не выбрано ничего
+        {
+            alert("Выберите авторов");
+            return false;
+        }
+
+        return true;
+    }
+
+    $.urlParam = function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+            return null;
+        }
+        return decodeURI(results[1]) || 0;
+    }
+</script>
+
+
+<h3>Редактирование книги:</h3>
+<div class="row">
+    <label for="book-name-input">Наименование:</label>
+    <input id="book-name-input" name="name" type="text"/>
+</div>
+<div class="row">
+    <label for="dropDownListGenre">Жанр:</label>
+    <select class="form-control" id="dropDownListGenre">
+    </select>
+</div>
+<div class="row">
+    <label for="dropDownListAuthors">Авторы:</label>
+    <select class="form-control" id="dropDownListAuthors" multiple="multiple">
+    </select>
+</div>
+<div class="row">
+    <button type="submit" onclick="updateBook($.urlParam('id'))">Изменить</button>
+    <a href="books-list.html">
+        <button type="button">Отменить</button>
+    </a>
+</div>
+
+</body>
+</html>

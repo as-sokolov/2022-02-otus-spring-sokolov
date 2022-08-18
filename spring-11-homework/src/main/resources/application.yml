@@ -1,0 +1,14 @@
+spring:
+  data:
+    mongodb:
+      authentication-database: none
+      database: library
+      port: 27017
+      host: localhost
+
+  main:
+    allow-circular-references: true
+
+
+dbinit: true
+
