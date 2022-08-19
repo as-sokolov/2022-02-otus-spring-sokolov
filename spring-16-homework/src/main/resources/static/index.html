@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Магазин Стивена Кинга</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+        .pictures {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .pictures tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .pictures td:last-child, td:first-child {
+            width: 50px;
+        }
+    </style>
+    <script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let bookLink = '';
+        let pictureLink = '';
+        $(function () {
+            getLink().then(link => {
+                getBooks(bookLink);
+                getPictures(pictureLink);
+            });
+        });
+
+        function getLink() {
+            return fetch("api/")
+                .then(data => data.json())
+                .then(data => data._links)
+                .then(data => {
+                    bookLink = data.books.href.substr(0, data.books.href.indexOf("{")) + "?size=100000";
+                    pictureLink = data.pictures.href.substr(0, data.pictures.href.indexOf("{")) + "?size=100000";
+                });
+        }
+
+        function getBooks(booksLink) {
+            fetch(booksLink)
+                .then(response => response.json())
+                .then(response => response._embedded.books)
+                .then(books => parseBooks(books));
+        }
+        function getPictures(picturesLink) {
+            fetch(picturesLink)
+                .then(response => response.json())
+                .then(response => response._embedded.pictures)
+                .then(pictures => parsePictures(pictures));
+        }
+
+
+        function parseBooks(books) {
+            let html = '';
+            if (books.length > 0) {
+                books.forEach(function(book) {
+                    html = `${html}<tr>
+                            <td>${book.name}</td>
+                            <td>${book.drawings}</td>
+                            <td>${book.decoration}</td>
+                            <td>${book.pageCount}</td>
+                            <td>${book.price}</td>
+                            <td><button type="submit" id="submitButton" onclick="sellBook('${book._links.self.href}')">Продано!</button></td>`;
+                });
+            }
+            const bookContainer = document.getElementById("bookContainer")
+            bookContainer.innerHTML = html;
+        }
+
+        function sellBook(link) {
+            fetch(link, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getBooks(bookLink)}});
+        }
+
+        function parsePictures(pictures) {
+            let html = '';
+            if (pictures.length > 0) {
+                pictures.forEach(function(picture) {
+                    html = `${html}<tr>
+                            <td>${picture.name}</td>
+                            <td>${picture.frameMaterial}</td>
+                            <td>${picture.price}</td>
+                            <td><button type="submit" id="submitButton" onclick="sellPicture('${picture._links.self.href}')">Продано!</button></td>`;
+                });
+            }
+            const pictureContainer = document.getElementById("pictureContainer")
+            pictureContainer.innerHTML = html;
+        }
+
+        function sellPicture(link) {
+            fetch(link, {method : 'DELETE'})
+                .then(response => response.text())
+                .then(text => {if (text !== '') {alert(text)} else {getPictures(pictureLink)}});
+        }
+
+
+    </script>
+</head>
+<body>
+<h3>Магазин Стивена Кинга</h3>
+<h3>Книги:</h3>
+<table class="books">
+    <thead>
+    <tr>
+        <th>Наименование</th>
+        <th>Вид картинок</th>
+        <th>Качество оформления</th>
+        <th>Количество страниц</th>
+        <th>Цена</th>
+    </tr>
+    </thead>
+    <tbody id="bookContainer">
+    </tbody>
+</table>
+<h3>Картины:</h3>
+<table class="pictures">
+    <thead>
+    <tr>
+        <th>Наименование</th>
+        <th>Материал рамки</th>
+        <th>Цена</th>
+    </tr>
+    </thead>
+    <tbody id="pictureContainer">
+    </tbody>
+</table>
+</body>
+</html>
