@@ -30,7 +30,7 @@ public class Book implements StephenKingArt {
     private String name;
 
     @Column(name = "price")
-    private String price;
+    private int price;
 
     @Column(name = "drawings")
     private String drawings;

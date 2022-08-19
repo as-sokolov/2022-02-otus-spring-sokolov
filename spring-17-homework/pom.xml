@@ -75,6 +75,11 @@
             <artifactId>jquery</artifactId>
             <version>3.5.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 
@@ -106,7 +111,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>ru.otus.homework.Main</mainClass>
+                            <mainClass>ru.otus.spring.Spring17HomeworkApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
