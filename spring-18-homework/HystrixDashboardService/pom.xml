@@ -86,7 +86,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
-							<mainClass>ru.otus.spring.Spring18HomeworkPublisherApplication</mainClass>
+							<mainClass>ru.otus.spring.Spring18HomeworkDashboardApplication</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

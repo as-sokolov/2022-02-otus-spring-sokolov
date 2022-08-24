@@ -20,5 +20,5 @@ WORKDIR $PROJECT_DIR
 COPY --from=0 $PROJECT_DIR/target/spring-18-homework-eureka* $PROJECT_DIR/
 COPY --from=0 $PROJECT_DIR/target/libs/* $PROJECT_DIR/libs/
 
-EXPOSE 8050
+EXPOSE 8070
 CMD ["java", "-jar", "/opt/project/spring-18-homework-eureka-0.0.1-SNAPSHOT.jar"]
