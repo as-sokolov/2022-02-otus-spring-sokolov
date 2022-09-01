@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: 'reviewer-service'
+server:
+  port: 8050
+
+eureka:
+  client:
+    service-url:
+      defaultZone: 'http://localhost:8070/eureka'
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    leaseExpirationDurationInSeconds: 90
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+
+failchance: 0

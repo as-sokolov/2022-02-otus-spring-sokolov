@@ -1,0 +1,65 @@
+server:
+  port: 8060
+spring:
+  application:
+    name: stephen-king-factory
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    #initialization-mode: always
+    #schema: schema.sql
+    #data: data.sql
+    driver-class-name: org.postgresql.Driver
+    password: sa
+    username: sa
+  sql:
+    init:
+      mode: always
+      #data-locations: data.sql
+      #schema-locations: schema.sql
+      encoding: UTF-8
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true
+  data:
+    rest:
+      basePath: /api
+
+StephenKing:
+  minpagerate: 30
+  maxpagerate: 50
+  picturechance: 10
+  bookpagecount: 350
+  minprice: 100
+  maxprice: 1000
+  healthcheckthreshold: 10000 # 10 seconds
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Его же используем в logback.xml
+#logging:
+#  file:
+#    path: ./spring-16-homework/logs/
+#    name: ./spring-16-homework/logs/SpringIntegration.log
+
+eureka:
+  client:
+    service-url:
+      defaultZone: 'http://localhost:8070/eureka'
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    leaseExpirationDurationInSeconds: 90
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true

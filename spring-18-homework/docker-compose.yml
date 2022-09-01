@@ -1,0 +1,70 @@
+version: "3.9"
+services:
+  postgresdb:
+    image: postgres
+    environment:
+      POSTGRES_DB: "testdb"
+      POSTGRES_USER: "sa"
+      POSTGRES_PASSWORD: "sa"
+    ports:
+      - "5432:5432"
+    networks:
+      nw:
+  eurekaserver:
+    image: spring-18-homework-eureka
+    ports:
+      - "8070:8070"
+    environment:
+      - eureka.client.service-url.defaultZone=http://eurekaserver:8070/eureka
+    networks:
+      nw:
+  publisher:
+    image: spring-18-homework-publisher
+    ports:
+      - "8040:8040"
+    environment:
+      - eureka.client.service-url.defaultZone=http://eurekaserver:8070/eureka
+    networks:
+      nw:
+    depends_on:
+      - eurekaserver
+  reviewer:
+    image: spring-18-homework-reviewer
+    ports:
+      - "8050:8050"
+    environment:
+      - eureka.client.service-url.defaultZone=http://eurekaserver:8070/eureka
+    networks:
+      nw:
+    depends_on:
+      - eurekaserver
+  web:
+    image: spring-18-homework-skf
+    ports:
+      - "8060:8060"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgresdb:5432/testdb
+      - spring.datasource.username=sa
+      - spring.datasource.password=sa
+      - eureka.client.service-url.defaultZone=http://eurekaserver:8070/eureka
+      #- logging.level.root=debug
+    depends_on:
+      - postgresdb
+      - eurekaserver
+      - publisher
+      - reviewer
+    networks:
+      nw:
+  dashboard:
+    image: spring-18-homework-dashboard
+    ports:
+      - "8080:8080"
+    environment:
+      - eureka.client.service-url.defaultZone=http://eurekaserver:8070/eureka
+    networks:
+      nw:
+    depends_on:
+      - web
+      - eurekaserver
+networks:
+  nw:
