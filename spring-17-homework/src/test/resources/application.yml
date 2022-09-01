@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    #initialization-mode: always
+    #schema: schema.sql
+    #data: data.sql
+
+  sql:
+    init:
+      mode: always
+      #data-locations: data.sql
+      #schema-locations: schema.sql
+      encoding: UTF-8
+  h2:
+    console:
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true
+  data:
+    rest:
+      basePath: /api
+
+StephenKing:
+  minpagerate: 5
+  maxpagerate: 10
+  picturechance: 3
+  bookpagecount: 350
+  minprice: 100
+  maxprice: 1000
+  healthcheckthreshold: 10000 # 10 seconds
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Его же используем в logback.xml
+#logging:
+#  file:
+#    path: ./spring-16-homework/logs/
+#    name: ./spring-16-homework/logs/SpringIntegration.log

@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  web:
+    image: spring-17-homework
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgresdb:5432/testdb
+      - spring.datasource.username=sa
+      - spring.datasource.password=sa
+      #- logging.level.root=debug
+    depends_on:
+      - postgresdb
+    networks:
+      nw:
+
+  postgresdb:
+    image: postgres
+    environment:
+      POSTGRES_DB: "testdb"
+      POSTGRES_USER: "sa"
+      POSTGRES_PASSWORD: "sa"
+    ports:
+      - "5432:5432"
+    networks:
+      nw:
+
+networks:
+  nw:
